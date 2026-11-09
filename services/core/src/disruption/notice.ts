@@ -10,10 +10,25 @@ export async function parseNotice(
 ): Promise<{ facts: NoticeFacts | null; error?: string }> {
   if (!text.trim()) return { facts: null };
   try {
-    return { facts: await noticeParse(serv, text) };
+    return { facts: normalizeFacts(await noticeParse(serv, text)) };
   } catch (e) {
     return { facts: null, error: (e as Error).message };
   }
+}
+
+/** Model timestamps can come back as "unknown" or "2026-12-21 08:40Z": keep valid instants (as ISO), null the rest. */
+export function normalizeTimestamp(v: string | null): string | null {
+  if (!v) return null;
+  const m = /(\d{4}-\d{2}-\d{2})[ T](\d{2}):(\d{2})(?::(\d{2}))?(?:\.\d+)?\s*(Z|[+-]\d{2}:?\d{2})?/.exec(v);
+  if (!m) return null;
+  const off =
+    !m[5] || m[5] === "Z" ? "Z" : m[5].includes(":") ? m[5] : `${m[5].slice(0, 3)}:${m[5].slice(3)}`;
+  const t = Date.parse(`${m[1]}T${m[2]}:${m[3]}:${m[4] ?? "00"}${off}`);
+  return Number.isFinite(t) ? new Date(t).toISOString() : null;
+}
+
+export function normalizeFacts(f: NoticeFacts): NoticeFacts {
+  return { ...f, newDepUtc: normalizeTimestamp(f.newDepUtc), noticeAtUtc: normalizeTimestamp(f.noticeAtUtc) };
 }
 
 const KIND_LABEL: Record<string, string> = {
