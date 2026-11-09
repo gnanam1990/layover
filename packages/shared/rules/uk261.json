@@ -1,6 +1,6 @@
 {
   "id": "uk261",
-  "version": "2026-11-09",
+  "version": "2026-11-09-s6",
   "name": "UK retained Regulation 261",
   "officialUrl": "https://www.caa.co.uk/passengers-and-public/your-rights/",
   "applies": {
@@ -38,17 +38,49 @@
     ]
   },
   "bands": [
-    { "maxKm": 1500, "amount": 220, "currency": "GBP", "careAfterMin": 120 },
-    { "maxKm": 3500, "amount": 350, "currency": "GBP", "careAfterMin": 180 },
-    { "maxKm": null, "amount": 520, "currency": "GBP", "careAfterMin": 240 }
+    {
+      "maxKm": 1500,
+      "amount": 220,
+      "currency": "GBP",
+      "careAfterMin": 120
+    },
+    {
+      "maxKm": 3500,
+      "amount": 350,
+      "currency": "GBP",
+      "careAfterMin": 180
+    },
+    {
+      "maxKm": null,
+      "amount": 520,
+      "currency": "GBP",
+      "careAfterMin": 240
+    }
   ],
   "cancellation": {
     "noCompensationIfNoticeDays": 14,
-    "refundOrReroute": true
+    "refundOrReroute": true,
+    "rerouteExemptions": [
+      {
+        "minNoticeDays": 7,
+        "maxEarlyMin": 120,
+        "maxLateMin": 240
+      },
+      {
+        "minNoticeDays": 0,
+        "maxEarlyMin": 60,
+        "maxLateMin": 120
+      }
+    ]
   },
   "delay": {
     "compensationArrivalDelayMin": 180,
-    "refundOrRerouteDepDelayMin": 300
+    "refundOrRerouteDepDelayMin": 300,
+    "longHaulReduction": {
+      "appliesToBandIndex": 2,
+      "arrivalDelayBelowMin": 240,
+      "bps": 5000
+    }
   },
   "care": {
     "meals": true,
@@ -67,19 +99,60 @@
     "Receipts for meals, hotel and transport"
   ],
   "entries": [
-    { "key": "applies", "confidence": "HIGH", "source": "UK Reg. 261/2004 (retained) Art. 3" },
+    {
+      "key": "applies",
+      "confidence": "HIGH",
+      "source": "UK Reg. 261/2004 (retained) Art. 3"
+    },
     {
       "key": "compensation.bands",
-      "confidence": "VERIFY",
-      "source": "UK Reg. 261/2004 (retained) Art. 7, amounts per CAA guidance"
+      "confidence": "HIGH",
+      "source": "CAA delays guidance (£220/£350/£520; £260 for 3–4 h long-haul) (S6)"
     },
-    { "key": "care.thresholds", "confidence": "MEDIUM", "source": "UK Reg. 261/2004 (retained) Art. 6" },
-    { "key": "cancellation.notice14", "confidence": "HIGH", "source": "UK Reg. 261/2004 (retained) Art. 5" },
-    { "key": "delay.arrival3h", "confidence": "HIGH", "source": "CAA guidance (Sturgeon applies)" },
-    { "key": "extraordinary", "confidence": "HIGH", "source": "UK Reg. 261/2004 (retained) Art. 5(3)" },
-    { "key": "care.hotel", "confidence": "HIGH", "source": "UK Reg. 261/2004 (retained) Art. 9" },
-    { "key": "care.meals", "confidence": "HIGH", "source": "UK Reg. 261/2004 (retained) Art. 9" },
-    { "key": "refundOrReroute", "confidence": "HIGH", "source": "UK Reg. 261/2004 (retained) Art. 8" },
-    { "key": "voucher", "confidence": "HIGH", "source": "UK Reg. 261/2004 (retained) Art. 7(3)" }
+    {
+      "key": "care.thresholds",
+      "confidence": "MEDIUM",
+      "source": "UK Reg. 261/2004 (retained) Art. 6"
+    },
+    {
+      "key": "cancellation.notice14",
+      "confidence": "HIGH",
+      "source": "UK Reg. 261/2004 (retained) Art. 5"
+    },
+    {
+      "key": "delay.arrival3h",
+      "confidence": "HIGH",
+      "source": "CAA guidance (Sturgeon applies)"
+    },
+    {
+      "key": "extraordinary",
+      "confidence": "HIGH",
+      "source": "UK Reg. 261/2004 (retained) Art. 5(3)"
+    },
+    {
+      "key": "care.hotel",
+      "confidence": "HIGH",
+      "source": "UK Reg. 261/2004 (retained) Art. 9"
+    },
+    {
+      "key": "care.meals",
+      "confidence": "HIGH",
+      "source": "UK Reg. 261/2004 (retained) Art. 9"
+    },
+    {
+      "key": "refundOrReroute",
+      "confidence": "HIGH",
+      "source": "UK Reg. 261/2004 (retained) Art. 8"
+    },
+    {
+      "key": "voucher",
+      "confidence": "HIGH",
+      "source": "UK Reg. 261/2004 (retained) Art. 7(3)"
+    },
+    {
+      "key": "delay.longhaul50pct",
+      "confidence": "HIGH",
+      "source": "CAA delays guidance: £260 when arriving 3–4 h late on long-haul (S6)"
+    }
   ]
 }

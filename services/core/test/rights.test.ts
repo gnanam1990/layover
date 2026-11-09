@@ -60,7 +60,7 @@ describe("EU261", () => {
     expect(ent(a, "eu261", "reroute")).toBeDefined();
     expect(pack(a, "eu261")!.doNot.join(" ")).toMatch(/voucher/i);
     expect(a!.bestRemedy.startsWith("eu261")).toBe(true);
-    expect(a!.rulePackVersions.eu261).toBe("2026-11-09");
+    expect(a!.rulePackVersions.eu261).toBe("2026-11-09-s6");
     expect(a!.disclaimer).toMatch(/not legal advice/i);
     expect(pack(a, "us_dot")).toBeUndefined();
   });
@@ -125,6 +125,148 @@ describe("EU261", () => {
   });
 });
 
+describe("S6 corrections", () => {
+  test("E6 band C arrival delay 3 h 30 m → €300 (50 % per Sturgeon para 63)", () => {
+    const a = assess({
+      flight: flight({}),
+      status: { state: "delayed", depDelayMin: 200, arrDelayMin: 210, reasonClass: "technical" },
+      facts: null,
+      now: NOW,
+    });
+    expect(ent(a, "eu261", "compensation")).toMatchObject({
+      amount: { amountMinor: "30000", currency: "EUR" },
+      confidence: "HIGH",
+    });
+  });
+  test("E6b band C arrival delay 4 h 10 m → full €600", () => {
+    const a = assess({
+      flight: flight({}),
+      status: { state: "delayed", depDelayMin: 250, arrDelayMin: 250, reasonClass: "technical" },
+      facts: null,
+      now: NOW,
+    });
+    expect(ent(a, "eu261", "compensation")?.amount?.amountMinor).toBe("60000");
+  });
+  test("UK261 long-haul 3–4 h late → £260", () => {
+    const ba = flight({
+      id: "BA143",
+      carrier: "BA",
+      number: "143",
+      from: "LHR",
+      to: "DEL",
+      airlineCountry: "GB",
+      schedDepUtc: "2026-12-20T20:00:00Z",
+      schedArrUtc: "2026-12-21T05:00:00Z",
+    });
+    const a = assess({
+      flight: ba,
+      status: { state: "delayed", depDelayMin: 200, arrDelayMin: 200, reasonClass: "technical" },
+      facts: null,
+      now: NOW,
+    });
+    expect(ent(a, "uk261", "compensation")).toMatchObject({
+      amount: { amountMinor: "26000", currency: "GBP" },
+      confidence: "HIGH",
+    });
+    expect(pack(a, "eu261")).toBeUndefined();
+  });
+  test("E7 told 10 days ahead with a re-route 1 h earlier → exempt; re-route 5 h later → compensation", () => {
+    const st = cancelled({ noticeAtUtc: "2026-12-10T20:50:00Z" });
+    const close = assess({
+      flight: flight({}),
+      status: st,
+      facts: facts({ offeredAlternatives: ["LH9 2026-12-20T19:50:00Z"], noticeAtUtc: null }),
+      now: NOW,
+    });
+    expect(ent(close, "eu261", "compensation")).toBeUndefined();
+    const far = assess({
+      flight: flight({}),
+      status: st,
+      facts: facts({ offeredAlternatives: ["LH9 2026-12-21T01:50:00Z"], noticeAtUtc: null }),
+      now: NOW,
+    });
+    expect(ent(far, "eu261", "compensation")?.amount?.amountMinor).toBe("60000");
+  });
+  const sixE = flight({
+    id: "6E2001",
+    carrier: "6E",
+    number: "2001",
+    from: "DEL",
+    to: "BOM",
+    airlineCountry: "IN",
+    schedDepUtc: "2026-12-20T06:00:00Z",
+    schedArrUtc: "2026-12-20T08:10:00Z",
+  });
+  test("I3 DGCA cancellation told 3 days ahead → alternate or refund only, no compensation", () => {
+    const a = assess({
+      flight: sixE,
+      status: cancelled({ noticeAtUtc: "2026-12-17T06:00:00Z" }),
+      facts: null,
+      now: NOW,
+    });
+    expect(ent(a, "in_dgca", "compensation")).toBeUndefined();
+    expect(ent(a, "in_dgca", "refund")).toBeDefined();
+  });
+  test("I4 DGCA meals threshold depends on block time (2 h for ≤ 2.5 h, 4 h for > 5 h)", () => {
+    const short = assess({
+      flight: sixE,
+      status: { state: "delayed", depDelayMin: 125, arrDelayMin: 125 },
+      facts: null,
+      now: NOW,
+    });
+    expect(ent(short, "in_dgca", "care_meal")).toBeDefined();
+    const long = flight({
+      id: "AI101",
+      carrier: "AI",
+      number: "101",
+      from: "DEL",
+      to: "JFK",
+      airlineCountry: "IN",
+      schedDepUtc: "2026-12-20T00:00:00Z",
+      schedArrUtc: "2026-12-20T15:00:00Z",
+    });
+    const a = assess({
+      flight: long,
+      status: { state: "delayed", depDelayMin: 200, arrDelayMin: 200 },
+      facts: null,
+      now: NOW,
+    });
+    expect(ent(a, "in_dgca", "care_meal")).toBeUndefined();
+  });
+  test("I5 DGCA hotel for > 6 h on a 20:00–03:00 departure; refund/alternate only for domestic", () => {
+    const night = flight({
+      id: "6E9",
+      carrier: "6E",
+      number: "9",
+      from: "DEL",
+      to: "BOM",
+      airlineCountry: "IN",
+      schedDepUtc: "2026-12-20T16:30:00Z",
+      schedArrUtc: "2026-12-20T18:40:00Z",
+    }); // 22:00 IST
+    const a = assess({
+      flight: night,
+      status: { state: "delayed", depDelayMin: 400, arrDelayMin: 400 },
+      facts: null,
+      now: NOW,
+    });
+    expect(ent(a, "in_dgca", "care_hotel")).toBeDefined();
+    expect(ent(a, "in_dgca", "refund")).toBeDefined();
+    const day = flight({
+      ...night,
+      schedDepUtc: "2026-12-20T05:30:00Z",
+      schedArrUtc: "2026-12-20T07:40:00Z",
+    }); // 11:00 IST
+    const b = assess({
+      flight: day,
+      status: { state: "delayed", depDelayMin: 400, arrDelayMin: 400 },
+      facts: null,
+      now: NOW,
+    });
+    expect(ent(b, "in_dgca", "care_hotel")).toBeUndefined();
+  });
+});
+
 describe("US DOT", () => {
   const ua = flight({
     id: "UA1782",
@@ -150,16 +292,26 @@ describe("US DOT", () => {
     expect(pack(a, "eu261")).toBeUndefined();
   });
 
-  test("U2 domestic departure delay 3 h 5 m → significant change MEDIUM, refund if you decline travel", () => {
+  test("U2 domestic delay 3 h 5 m on arrival → significant change MEDIUM, refund if you decline travel", () => {
     const a = assess({
       flight: ua,
-      status: { state: "delayed", depDelayMin: 185, arrDelayMin: 170, reasonClass: "crew" },
+      status: { state: "delayed", depDelayMin: 185, arrDelayMin: 185, reasonClass: "crew" },
       facts: null,
       now: NOW,
     });
     const r = ent(a, "us_dot", "refund");
     expect(r?.confidence).toBe("MEDIUM");
     expect(r?.basis).toMatch(/decline/i);
+  });
+
+  test("U3 (S6) departure 3 h 5 m late but arrival only 2 h 50 m late → not a significant change", () => {
+    const a = assess({
+      flight: ua,
+      status: { state: "delayed", depDelayMin: 185, arrDelayMin: 170, reasonClass: "crew" },
+      facts: null,
+      now: NOW,
+    });
+    expect(ent(a, "us_dot", "refund")).toBeUndefined();
   });
 });
 
