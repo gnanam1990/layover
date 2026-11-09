@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "trip-settings.json",
+  "title": "trip-settings",
+  "type": "object",
+  "required": [
+    "autoRebook",
+    "minSaving",
+    "autoRescue",
+    "emergencyBudget",
+    "maxPerBooking"
+  ],
+  "properties": {
+    "autoRebook": {
+      "type": "boolean"
+    },
+    "minSaving": {
+      "$ref": "money.json"
+    },
+    "autoRescue": {
+      "type": "boolean"
+    },
+    "emergencyBudget": {
+      "$ref": "money.json"
+    },
+    "maxPerBooking": {
+      "$ref": "money.json"
+    },
+    "maxHotelDistanceKm": {
+      "type": "number",
+      "default": 10
+    },
+    "minRating": {
+      "type": "number",
+      "default": 3.5
+    }
+  }
+}

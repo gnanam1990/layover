@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "claim-pack.json",
+  "title": "claim-pack",
+  "type": "object",
+  "required": [
+    "id",
+    "tripId",
+    "flightId",
+    "airline",
+    "entitlements",
+    "receipts",
+    "letter",
+    "validated"
+  ],
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "tripId": {
+      "type": "string"
+    },
+    "flightId": {
+      "type": "string"
+    },
+    "airline": {
+      "type": "string"
+    },
+    "packs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "entitlements": {
+      "type": "array"
+    },
+    "timeline": {
+      "type": "array"
+    },
+    "receipts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "desc",
+          "amount",
+          "tx",
+          "explorerUrl"
+        ],
+        "properties": {
+          "desc": {
+            "type": "string"
+          },
+          "amount": {
+            "$ref": "money.json"
+          },
+          "tx": {
+            "type": "string"
+          },
+          "explorerUrl": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "letter": {
+      "type": "object",
+      "required": [
+        "subject",
+        "body"
+      ],
+      "properties": {
+        "subject": {
+          "type": "string"
+        },
+        "body": {
+          "type": "string"
+        }
+      }
+    },
+    "validated": {
+      "type": "boolean"
+    }
+  }
+}

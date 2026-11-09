@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "serv-claim-letter.json",
+  "title": "serv-claim-letter",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "subject",
+    "body"
+  ],
+  "properties": {
+    "subject": {
+      "type": "string"
+    },
+    "body": {
+      "type": "string"
+    }
+  }
+}

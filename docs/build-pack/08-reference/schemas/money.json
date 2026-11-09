@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "money.json",
+  "title": "money",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "amountMinor",
+    "currency"
+  ],
+  "properties": {
+    "amountMinor": {
+      "type": "string",
+      "pattern": "^-?[0-9]+$"
+    },
+    "currency": {
+      "enum": [
+        "USD",
+        "EUR",
+        "GBP",
+        "INR"
+      ]
+    }
+  }
+}

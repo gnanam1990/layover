@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "hotel-booking.json",
+  "title": "hotel-booking",
+  "type": "object",
+  "required": [
+    "id",
+    "merchantId",
+    "hotelId",
+    "hotelName",
+    "checkIn",
+    "checkOut",
+    "price",
+    "refundable",
+    "status"
+  ],
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "merchantId": {
+      "type": "string"
+    },
+    "hotelId": {
+      "type": "string"
+    },
+    "hotelName": {
+      "type": "string"
+    },
+    "rating": {
+      "type": "number"
+    },
+    "roomClass": {
+      "enum": [
+        "standard",
+        "superior",
+        "deluxe",
+        "suite"
+      ]
+    },
+    "checkIn": {
+      "type": "string",
+      "format": "date"
+    },
+    "checkOut": {
+      "type": "string",
+      "format": "date"
+    },
+    "price": {
+      "$ref": "money.json"
+    },
+    "refundable": {
+      "type": "boolean"
+    },
+    "cancelDeadlineUtc": {
+      "type": "string"
+    },
+    "confirmation": {
+      "type": "string"
+    },
+    "paymentTx": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "payer": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "status": {
+      "enum": [
+        "active",
+        "cancelled",
+        "replaced"
+      ]
+    }
+  }
+}

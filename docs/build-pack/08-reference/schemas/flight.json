@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "flight.json",
+  "title": "flight",
+  "type": "object",
+  "required": [
+    "id",
+    "carrier",
+    "number",
+    "from",
+    "to",
+    "schedDepUtc",
+    "schedArrUtc"
+  ],
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "carrier": {
+      "type": "string"
+    },
+    "number": {
+      "type": "string"
+    },
+    "from": {
+      "type": "string",
+      "pattern": "^[A-Z]{3}$"
+    },
+    "to": {
+      "type": "string",
+      "pattern": "^[A-Z]{3}$"
+    },
+    "schedDepUtc": {
+      "type": "string"
+    },
+    "schedArrUtc": {
+      "type": "string"
+    },
+    "bookingRef": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "airlineCountry": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "status": {
+      "$ref": "flight-status.json"
+    }
+  }
+}

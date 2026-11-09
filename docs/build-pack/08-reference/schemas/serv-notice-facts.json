@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "serv-notice-facts.json",
+  "title": "serv-notice-facts",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "state",
+    "newDepUtc",
+    "offeredAlternatives",
+    "offeredVoucher",
+    "reasonClass",
+    "noticeAtUtc"
+  ],
+  "properties": {
+    "state": {
+      "enum": [
+        "cancelled",
+        "delayed",
+        "rescheduled",
+        "unknown"
+      ]
+    },
+    "newDepUtc": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "offeredAlternatives": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "offeredVoucher": {
+      "type": "boolean"
+    },
+    "reasonClass": {
+      "enum": [
+        "weather",
+        "atc",
+        "security",
+        "technical",
+        "crew",
+        "strike",
+        "unknown"
+      ]
+    },
+    "noticeAtUtc": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  }
+}

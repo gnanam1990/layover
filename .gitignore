@@ -1,0 +1,14 @@
+node_modules
+.env
+.env.*
+!.env.example
+.kite-passport
+*.db
+*.db-*
+services/mocks/.state.json
+.next
+dist
+coverage
+playwright-report
+test-results
+*.tsbuildinfo

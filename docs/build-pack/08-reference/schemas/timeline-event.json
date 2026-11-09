@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "timeline-event.json",
+  "title": "timeline-event",
+  "type": "object",
+  "required": [
+    "id",
+    "tripId",
+    "atUtc",
+    "type",
+    "simulated",
+    "title"
+  ],
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "tripId": {
+      "type": "string"
+    },
+    "atUtc": {
+      "type": "string"
+    },
+    "type": {
+      "enum": [
+        "trip_added",
+        "session_requested",
+        "session_active",
+        "price_checked",
+        "price_drop",
+        "policy_decision",
+        "payment",
+        "booking_confirmed",
+        "cancel_requested",
+        "refund_verified",
+        "flight_status",
+        "disruption",
+        "rights_assessed",
+        "rescue_booked",
+        "voucher_warning",
+        "claim_ready",
+        "error"
+      ]
+    },
+    "simulated": {
+      "type": "boolean"
+    },
+    "title": {
+      "type": "string"
+    },
+    "detail": {
+      "type": "string"
+    },
+    "data": {
+      "type": "object"
+    },
+    "links": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

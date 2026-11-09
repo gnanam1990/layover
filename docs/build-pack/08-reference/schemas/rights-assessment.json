@@ -1,0 +1,118 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "rights-assessment.json",
+  "title": "rights-assessment",
+  "type": "object",
+  "required": [
+    "flightId",
+    "packs",
+    "bestRemedy",
+    "rulePackVersions",
+    "disclaimer"
+  ],
+  "properties": {
+    "flightId": {
+      "type": "string"
+    },
+    "packs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "pack",
+          "applies",
+          "entitlements",
+          "doNot",
+          "actions",
+          "evidenceNeeded"
+        ],
+        "properties": {
+          "pack": {
+            "enum": [
+              "eu261",
+              "uk261",
+              "us_dot",
+              "in_dgca"
+            ]
+          },
+          "applies": {
+            "type": "boolean"
+          },
+          "why": {
+            "type": "string"
+          },
+          "entitlements": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "kind",
+                "confidence",
+                "basis",
+                "sourceUrl"
+              ],
+              "properties": {
+                "kind": {
+                  "enum": [
+                    "refund",
+                    "compensation",
+                    "care_meal",
+                    "care_hotel",
+                    "care_transport",
+                    "reroute"
+                  ]
+                },
+                "amount": {
+                  "$ref": "money.json"
+                },
+                "amountUpTo": {
+                  "$ref": "money.json"
+                },
+                "confidence": {
+                  "enum": [
+                    "HIGH",
+                    "MEDIUM",
+                    "VERIFY"
+                  ]
+                },
+                "basis": {
+                  "type": "string"
+                },
+                "sourceUrl": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "doNot": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "actions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "evidenceNeeded": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "bestRemedy": {
+      "type": "string"
+    },
+    "rulePackVersions": {
+      "type": "object"
+    },
+    "disclaimer": {
+      "type": "string"
+    }
+  }
+}

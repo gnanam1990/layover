@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "flight-status.json",
+  "title": "flight-status",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "state",
+    "depDelayMin",
+    "arrDelayMin"
+  ],
+  "properties": {
+    "state": {
+      "enum": [
+        "scheduled",
+        "delayed",
+        "cancelled",
+        "departed",
+        "arrived"
+      ]
+    },
+    "depDelayMin": {
+      "type": "integer"
+    },
+    "arrDelayMin": {
+      "type": "integer"
+    },
+    "noticeAtUtc": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "reasonText": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "reasonClass": {
+      "enum": [
+        "weather",
+        "atc",
+        "security",
+        "technical",
+        "crew",
+        "strike",
+        "unknown",
+        null
+      ]
+    }
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "policy-decision.json",
+  "title": "policy-decision",
+  "type": "object",
+  "required": [
+    "allow",
+    "action",
+    "checks",
+    "reasons"
+  ],
+  "properties": {
+    "allow": {
+      "type": "boolean"
+    },
+    "action": {
+      "enum": [
+        "rebook",
+        "rescue_hotel",
+        "rescue_ride"
+      ]
+    },
+    "checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "name",
+          "pass",
+          "detail"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "pass": {
+            "type": "boolean"
+          },
+          "detail": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "reasons": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}
