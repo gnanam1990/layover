@@ -71,6 +71,9 @@ test("Act 1: drop price → rebook sequence and savings banner within 5 s", asyn
   await expect(tl.getByText(/Cancelled Hotel Lumen Goa/)).toBeVisible();
   await expect(tl.getByText("Saved $14.00 · fee $4.20")).toBeVisible();
   await expect(tl.getByText("Simulated").first()).toBeVisible();
+  const who = page.getByRole("region", { name: "Who's acting for you" });
+  await expect(who.getByText("(agent_fake_layover)")).toBeVisible();
+  await expect(who.getByText("$270.00")).toBeVisible();
   await shot(page, "s3-dashboard");
   await noSeriousA11y(page);
 });
@@ -106,6 +109,7 @@ test("claim: entitlements, receipt with tx link, letter, copy and email", async 
   const receipts = page.getByRole("region", { name: "Receipts" });
   await expect(receipts.getByText("$96.00")).toBeVisible();
   await expect(receipts.getByRole("link")).toHaveAttribute("href", /kitescan\.ai\/tx\/0x/);
+  await expect(page.getByText("Claim value: €600.00 compensation + $96.00 in receipts")).toBeVisible();
   await expect(page.getByRole("button", { name: "Copy letter" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Open email" })).toHaveAttribute("href", /^mailto:/);
   await shot(page, "s5-claim");

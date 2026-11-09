@@ -53,6 +53,8 @@ export interface PassportStatus {
   email?: string;
   wallet?: string;
   sandbox?: boolean;
+  /** The agent identity Kite Passport knows Layover by (verifiable identity, Kite track). */
+  agent?: { id: string; type: string };
 }
 
 export type PayerKind = "passport" | "direct" | "fake";

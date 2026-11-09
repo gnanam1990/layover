@@ -55,7 +55,12 @@ export class DirectX402Payer implements PassportAdapter {
   }
 
   async status(): Promise<PassportStatus> {
-    return { loggedIn: true, wallet: this.account.address, sandbox: this.chainId === 2368 };
+    return {
+      loggedIn: true,
+      wallet: this.account.address,
+      sandbox: this.chainId === 2368,
+      agent: { id: `direct:${this.account.address}`, type: "direct-x402" },
+    };
   }
   async walletAddress() {
     return this.account.address;

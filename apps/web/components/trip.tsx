@@ -1,7 +1,9 @@
+"use client";
 import Link from "next/link";
 import type { Money, PolicyDecision, SessionRecord, Trip } from "@layover/shared";
 import { dateShort, dateTime, money } from "../lib/format";
 import { Caption, Card, StatusChip } from "./ui";
+import { useHealth } from "./TopBar";
 
 export function TripCard({
   trip,
@@ -153,6 +155,57 @@ export function DecisionCard({
         ))}
       </ul>
       {why && <p className="t-small mt-3 text-muted">Why: {why}</p>}
+    </Card>
+  );
+}
+
+/** "Who's acting for you": the verifiable identity and limits behind every payment (Kite track). */
+export function AgentCard({ session }: { session: SessionRecord | null }) {
+  const h = useHealth();
+  if (!h) return null;
+  const p = h.passport;
+  const identity =
+    h.payer === "passport"
+      ? "Kite Agent Passport"
+      : h.payer === "direct"
+        ? "Direct x402 key (testnet)"
+        : "Fake payer (offline)";
+  return (
+    <Card aria-label="Who's acting for you">
+      <Caption>Who&apos;s acting for you</Caption>
+      <dl className="t-small mt-2 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1.5">
+        <dt className="text-muted">Agent</dt>
+        <dd className="text-ink">
+          Layover{" "}
+          {p.agent ? (
+            <span className="mono">({p.agent.id})</span>
+          ) : (
+            <span className="text-muted">(registers on first approval)</span>
+          )}
+        </dd>
+        <dt className="text-muted">Identity</dt>
+        <dd className="text-ink">{identity}</dd>
+        <dt className="text-muted">For</dt>
+        <dd className="text-ink">{p.email ?? "—"}</dd>
+        <dt className="text-muted">Wallet</dt>
+        <dd className="mono text-ink">{p.wallet ? `${p.wallet.slice(0, 6)}…${p.wallet.slice(-4)}` : "—"}</dd>
+        <dt className="text-muted">Can spend</dt>
+        <dd className="text-ink">
+          {session ? (
+            <>
+              <span className="mono">{money(session.maxPerTx)}</span> per booking ·{" "}
+              <span className="mono">{money(session.maxTotal)}</span> total
+            </>
+          ) : (
+            "nothing until you approve a session"
+          )}
+        </dd>
+        <dt className="text-muted">Until</dt>
+        <dd className="text-ink">{session ? dateTime(session.ttlUntilUtc) : "—"}</dd>
+      </dl>
+      <p className="t-small mt-2 text-muted">
+        Every payment is checked by Layover&apos;s policy gate and capped by Kite.
+      </p>
     </Card>
   );
 }

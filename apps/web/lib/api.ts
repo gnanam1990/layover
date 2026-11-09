@@ -41,7 +41,13 @@ export interface Health {
   demoClock: boolean;
   serv: "serv" | "offline-stub";
   payer: "passport" | "direct" | "fake";
-  passport: { loggedIn: boolean; email?: string; wallet?: string; sandbox?: boolean };
+  passport: {
+    loggedIn: boolean;
+    email?: string;
+    wallet?: string;
+    sandbox?: boolean;
+    agent?: { id: string; type: string };
+  };
   merchant: { url: string; ok: boolean };
   network: "testnet" | "mainnet";
   priceScale: number;
@@ -52,7 +58,11 @@ export interface TripDetail {
   trip: Trip;
   session: SessionRecord | null;
   spent: Money;
-  rights: { assessment: RightsAssessment; explanation: Explanation & { source?: string } } | null;
+  rights: {
+    assessment: RightsAssessment;
+    explanation: Explanation & { source?: string };
+    desk?: { language: string; phrases: { local: string; english: string }[] };
+  } | null;
   claim: { pack: ClaimPack; mailto: string | null } | null;
   pendingRescue: { options: Offer[] } | null;
   pendingRebook: { bookingId: string; offer: Offer }[];

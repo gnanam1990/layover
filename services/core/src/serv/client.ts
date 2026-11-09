@@ -4,7 +4,8 @@ import type { Db } from "../db";
 
 export const SERV_BASE_URL = "https://inference-api.openserv.ai/v1";
 
-export type StepName = "TripIntake" | "NoticeParse" | "RightsExplain" | "OptionRank" | "ClaimDraft";
+export type StepName =
+  "TripIntake" | "NoticeParse" | "RightsExplain" | "OptionRank" | "ClaimDraft" | "DeskPhrases";
 export type ServTool = "prompt_guard" | { shadow: { hint: string; maxIterations?: number } };
 
 export class ServError extends Error {

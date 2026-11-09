@@ -7,6 +7,8 @@ import type { MerchantClient } from "../merchant/client";
 import type { ServClient } from "../serv/client";
 import { assess, needsVoucherWarning, overnightNeeded } from "../rights/engine";
 import { explainRights, parseNotice } from "./notice";
+import { deskPhrases } from "../serv/prompts/deskPhrases";
+import { AIRPORTS, DESK_LANGUAGE } from "@layover/shared";
 
 export interface DisruptionInfo {
   tripId: string;
@@ -119,13 +121,18 @@ export class DisruptionDetector {
       data: { flightId: flight.id, facts, overnightNeeded: night.needed, nightDate: night.nightDate },
     });
     const explanation = await explainRights(this.d.serv, assessment);
+    // Desk phrases in the airport's language (skipped where English is fine, or if SERV is unavailable).
+    const lang = DESK_LANGUAGE[AIRPORTS[flight.from]?.country ?? ""] ?? null;
+    const desk = lang
+      ? await deskPhrases(this.d.serv, explanation.bullets.slice(0, 4), lang, assessment).catch(() => null)
+      : null;
     const packs = assessment.packs.map((p) => PACK_LABEL[p.pack]);
     timeline.append({
       tripId,
       type: "rights_assessed",
       title: `Your rights: ${packs.join(", ") || "none found"}`,
       detail: explanation.headline,
-      data: { assessmentId: id, assessment, explanation },
+      data: { assessmentId: id, assessment, explanation, ...(desk && { desk }) },
     });
     await this.d.onDisruption({
       tripId,

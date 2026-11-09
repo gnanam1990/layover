@@ -48,7 +48,13 @@ export class FakePassport implements PassportAdapter {
   }
 
   async status(): Promise<PassportStatus> {
-    return { loggedIn: true, email: "fake@layover.test", wallet: this.wallet, sandbox: true };
+    return {
+      loggedIn: true,
+      email: "fake@layover.test",
+      wallet: this.wallet,
+      sandbox: true,
+      agent: { id: "agent_fake_layover", type: "layover" },
+    };
   }
   async walletAddress() {
     return this.wallet;
