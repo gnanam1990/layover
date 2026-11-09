@@ -63,3 +63,11 @@ Deviations from `docs/build-pack/` and spike evidence, newest last.
 - Rebook idempotency key: `tripId:bookingId:hotelId-roomClass-tier`, claimed in the `rebooks` table before paying; an in-process lock per booking stops two concurrent ticks.
 - The fee is 30 % of the saving in integer cents (`pct(saving, 3000)`): saving $14.00 → fee $4.20, traveler keeps $9.80.
 - Refund check: poll the chain every 5 s; after 2 min emit "Refund pending" and keep polling up to 30 min.
+
+## D7 — 2026-11-09 · M07 rights engine and disruption detector
+- The engine (`rights/engine.ts`) is pure and has **no free-text input**: it takes the flight, the feed status and SERV-parsed `NoticeFacts`. Amounts come only from rule-pack JSON; VERIFY amounts are emitted as `amountUpTo`.
+- Only packs that apply are listed. `bestRemedy` ranks: HIGH compensation with an amount > any compensation > HIGH refund (no FX comparisons between currencies).
+- Overnight rule: cancelled and no offered alternative before 06:00 local next day, or departure pushed to ≥ 23:00 local / the next day. `nightDate` = local date of the original departure at the origin (airport time zone).
+- EU261 band C delays of 3–4 h are emitted as "up to €600, VERIFY" because Art. 7(2)(c) may halve them.
+- US DOT meals/hotel appear only as "Airline commitment (DOT dashboard), check the airline" (MEDIUM), and only for controllable causes (technical, crew).
+- If NoticeParse fails, the engine still runs on the feed status and the timeline gets an error event. If RightsExplain fails its number post-check twice, a deterministic explanation built from the assessment is shown (`source: "deterministic"`).
