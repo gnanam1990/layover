@@ -37,9 +37,9 @@
   --r-input: 8px;
   --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(91, 75, 36, 0.06);
   /* Type (next/font variables with spec fallbacks) */
-  --font-sans: var(--font-dm-sans), -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
-  --font-mono: var(--font-jetbrains-mono), "Roboto Mono", ui-monospace, monospace;
-  --font-serif-pp: var(--font-spectral), Georgia, serif;
+  --font-sans: "DM Sans", -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+  --font-mono: "JetBrains Mono", "Roboto Mono", ui-monospace, monospace;
+  --font-serif-pp: "Spectral", Georgia, serif;
 }
 
 @theme inline {

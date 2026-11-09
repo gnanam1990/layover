@@ -11,6 +11,9 @@
     "e2e": "playwright test"
   },
   "dependencies": {
+    "@fontsource/dm-sans": "^5.3.0",
+    "@fontsource/jetbrains-mono": "^5.3.0",
+    "@fontsource/spectral": "^5.3.0",
     "@layover/shared": "workspace:*",
     "next": "^15.5.29",
     "qrcode": "^1.5.4",

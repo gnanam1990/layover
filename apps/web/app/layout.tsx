@@ -1,14 +1,12 @@
 import type { ReactNode } from "react";
-import { DM_Sans, JetBrains_Mono, Spectral } from "next/font/google";
+// Self-hosted fonts (no network at build time): DM Sans 400/500/700, JetBrains Mono 400/500, Spectral 400.
+import "@fontsource/dm-sans/400.css";
+import "@fontsource/dm-sans/500.css";
+import "@fontsource/dm-sans/700.css";
+import "@fontsource/jetbrains-mono/400.css";
+import "@fontsource/jetbrains-mono/500.css";
+import "@fontsource/spectral/400.css";
 import "../styles/theme.css";
-
-const dmSans = DM_Sans({ subsets: ["latin"], weight: ["400", "500", "700"], variable: "--font-dm-sans" });
-const mono = JetBrains_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500"],
-  variable: "--font-jetbrains-mono",
-});
-const spectral = Spectral({ subsets: ["latin"], weight: ["400"], variable: "--font-spectral" });
 
 export const metadata = {
   title: "Layover · your trip's guardian",
@@ -18,7 +16,7 @@ export const metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className={`${dmSans.variable} ${mono.variable} ${spectral.variable}`}>
+    <html lang="en">
       <body className="min-h-screen">{children}</body>
     </html>
   );
