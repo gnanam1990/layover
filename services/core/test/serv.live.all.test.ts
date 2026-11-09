@@ -33,7 +33,12 @@ const status: FlightStatus = {
 };
 
 describe.skipIf(!LIVE)("@live SERV, every step", () => {
-  const serv = createServClient({ apiKey: process.env.SERV_API_KEY ?? "" });
+  // Created lazily: the suite body runs at collection time even when skipped (CI has no key).
+  let client: ReturnType<typeof createServClient> | undefined;
+  const serv: ReturnType<typeof createServClient> = {
+    call: (step, opts) =>
+      (client ??= createServClient({ apiKey: process.env.SERV_API_KEY! })).call(step, opts),
+  };
   const timed = async <X>(label: string, f: () => Promise<X>) => {
     const t0 = Date.now();
     const v = await f();
