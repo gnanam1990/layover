@@ -19,9 +19,18 @@ const facilitator =
     ? new SimulatedFacilitator()
     : new HTTPFacilitatorClient({ url: env.FACILITATOR_URL || "https://facilitator.pieverse.io/v2" });
 
+// Fully offline (FACILITATOR_URL=sim and no key): refunds are simulated too, with an obviously fake hash.
+const simulatedRefundSender = {
+  async send(_to: string, _atomic: bigint, key: string) {
+    const h = new Bun.CryptoHasher("sha256").update(`refund:${key}`).digest("hex");
+    return `0x${h}`;
+  },
+};
 const refundSender = env.MERCHANT_REFUND_KEY
   ? createViemRefundSender(NETWORKS[network], env.MERCHANT_REFUND_KEY as Hex)
-  : unconfiguredRefundSender;
+  : env.FACILITATOR_URL === "sim"
+    ? simulatedRefundSender
+    : unconfiguredRefundSender;
 
 const coreUrl = env.CORE_URL;
 const app = createMerchantApp({

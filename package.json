@@ -14,7 +14,9 @@
     "lint": "eslint . && prettier --check .",
     "format": "prettier --write .",
     "demo:act1": "pnpm --filter @layover/core demo:act1",
-    "demo:act2": "pnpm --filter @layover/core demo:act2"
+    "demo:act2": "pnpm --filter @layover/core demo:act2",
+    "dev:offline": "bun scripts/dev-offline.ts",
+    "e2e": "pnpm --filter @layover/web e2e"
   },
   "devDependencies": {
     "@types/bun": "^1.4.4",

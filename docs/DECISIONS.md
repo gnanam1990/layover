@@ -95,3 +95,9 @@ Not modelled (out of demo scope): DGCA denied boarding (para 3.2) and downgrades
 - **Offline mode** for tests/dev: `PAYER=fake` (FakePassport) + `FACILITATOR_URL=sim` on the merchant + no `SERV_API_KEY` → a deterministic SERV stub. `/health` reports `serv: "offline-stub"` and `payer: "fake"`; never used for the recorded demo.
 - Ticks (background loops and demo buttons) run on one serialized chain, so a demo button and a poll never interleave.
 - Fixes found by running real processes: the merchant now rolls a cancellation back if its refund can't be sent; Dropwatch no longer re-announces a drop it already acted on.
+
+## D10 — 2026-11-09 · M11 web app
+- The browser talks only to the Next.js route `/api/core/*`, which adds `LAYOVER_LOCAL_TOKEN` server-side and streams responses (incl. SSE with `Last-Event-ID`).
+- **Contrast fix:** the spec's warn colour `#B7791F` on `#FFF4E5` is 3.35:1 (fails WCAG AA, which the spec requires). Warning *text* uses `--warn-text: #8A5A12` (≈ 5.9:1); `--warn` stays for accents.
+- **"Simulated" label:** only events that describe the simulated world (price checks/drops from the mock merchant, mock flight status, the disruption) are labeled Simulated. Layover's responses (policy decisions, Kite payments, on-chain refunds, rescue booking, claim) are real and are never labeled Simulated, so the demo never undersells real transactions.
+- Offline stack (`pnpm dev:offline`): fake payer, SERV stub, simulated facilitator, simulated refunds and chain checks. The top bar shows "Fake payer" and "SERV offline stub" whenever it runs. Playwright + axe run against it in CI.
