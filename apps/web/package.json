@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 3000",
+    "dev": "node --env-file-if-exists=../../.env ./node_modules/next/dist/bin/next dev -p 3000",
     "build": "next build",
-    "start": "next start -p 3000",
+    "start": "node --env-file-if-exists=../../.env ./node_modules/next/dist/bin/next start -p 3000",
     "test": "echo \"web: unit tests live in Playwright (pnpm --filter @layover/web e2e)\"",
     "typecheck": "tsc --noEmit",
     "e2e": "playwright test"
