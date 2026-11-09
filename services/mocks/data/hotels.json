@@ -1,0 +1,72 @@
+[
+  {
+    "hotelId": "lumen-goa",
+    "hotelName": "Hotel Lumen Goa",
+    "city": "GOI",
+    "rating": 4.2,
+    "lat": 15.39,
+    "lon": 73.88,
+    "refundable": true,
+    "rooms": { "standard": 72, "superior": 96 }
+  },
+  {
+    "hotelId": "casa-mar",
+    "hotelName": "Casa Mar",
+    "city": "GOI",
+    "rating": 4.4,
+    "lat": 15.4008,
+    "lon": 73.88,
+    "refundable": true,
+    "rooms": { "standard": 80 }
+  },
+  {
+    "hotelId": "palm-row",
+    "hotelName": "Palm Row",
+    "city": "GOI",
+    "rating": 3.9,
+    "lat": 15.3828,
+    "lon": 73.88,
+    "refundable": true,
+    "rooms": { "standard": 64 }
+  },
+  {
+    "hotelId": "airport-lodge-fra",
+    "hotelName": "Airport Lodge FRA",
+    "city": "FRA",
+    "rating": 4.0,
+    "lat": 49.9839,
+    "lon": 8.5622,
+    "refundable": true,
+    "rooms": { "standard": 96 }
+  },
+  {
+    "hotelId": "main-riverside",
+    "hotelName": "Main Riverside",
+    "city": "FRA",
+    "rating": 4.3,
+    "lat": 50.1549,
+    "lon": 8.5622,
+    "refundable": true,
+    "rooms": { "standard": 110 }
+  },
+  {
+    "hotelId": "terminal-inn",
+    "hotelName": "Terminal Inn",
+    "city": "FRA",
+    "rating": 3.6,
+    "lat": 50.0559,
+    "lon": 8.5622,
+    "refundable": false,
+    "rooms": { "standard": 64 }
+  },
+  {
+    "hotelId": "rhein-hostel",
+    "hotelName": "Rhein Hostel",
+    "city": "FRA",
+    "rating": 3.4,
+    "lat": 50.0379,
+    "lon": 8.6744,
+    "refundable": true,
+    "rooms": { "standard": 58 }
+  }
+]
