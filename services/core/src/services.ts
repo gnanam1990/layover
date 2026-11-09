@@ -8,6 +8,7 @@ import { createMerchantClient, withRealFlights, type MerchantClient } from "./me
 import { DataBuyer, purchaseLink } from "./realdata/buyer";
 import { RealFlights } from "./realdata/flights";
 import { RealHotels } from "./realdata/hotels";
+import { baseRpc, createBaseVerifier } from "./realdata/base-verify";
 import { createChainVerifier, type ChainVerifier } from "./chain/verify";
 import type { PassportAdapter } from "./passport/adapter";
 import { KpassPassport } from "./passport/kpass";
@@ -90,7 +91,14 @@ export function buildServices(cfg: Config, o: ServiceOverrides = {}): Services {
           })
         : new KpassPassport());
   // Real-data mode: flight status, airports and live hotel rates are bought from Kite's catalog.
-  const buyer = o.dataBuyer ?? (cfg.realData ? new DataBuyer(passport, clock) : undefined);
+  const buyer =
+    o.dataBuyer ??
+    (cfg.realData
+      ? new DataBuyer(passport, clock, {
+          verifier: createBaseVerifier(baseRpc()),
+          payer: async () => passport.walletAddress(),
+        })
+      : undefined);
   const realFlights = buyer ? new RealFlights(buyer, clock, cfg.realFlightTtlMs) : undefined;
   const realHotels = buyer ? new RealHotels(buyer, clock, cfg.realHotelTtlMs) : undefined;
   const merchant = realFlights ? withRealFlights(baseMerchant, realFlights) : baseMerchant;

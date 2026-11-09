@@ -27,7 +27,8 @@ export interface ReceiptLike {
 export interface RefundExpectation {
   token: string;
   from: string;
-  to: string;
+  /** Omit to accept any recipient (e.g. a data provider's payTo we don't know). */
+  to?: string;
   amountAtomic: bigint;
 }
 
@@ -47,7 +48,8 @@ export function verifyRefundInReceipt(receipt: ReceiptLike, exp: RefundExpectati
         data: log.data,
       });
       const { from, to, value } = ev.args as { from: string; to: string; value: bigint };
-      if (eq(from, exp.from) && eq(to, exp.to) && value === exp.amountAtomic) return true;
+      if (eq(from, exp.from) && (exp.to === undefined || eq(to, exp.to)) && value === exp.amountAtomic)
+        return true;
     } catch {
       // not a standard Transfer log; ignore
     }

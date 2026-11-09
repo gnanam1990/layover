@@ -144,3 +144,10 @@ Run with the owner's key (`LIVE=1 bun test test/serv.live.test.ts test/serv.live
 Fixes from the live run:
 - SERV returned `noticeAtUtc: "unknown"` and `newDepUtc: "2026-12-21 08:40Z"`. Facts are now normalized (valid instants → ISO, anything else → null) so the rights engine never sees a non-date, and the shadow hint asks for ISO-8601 or null.
 - RightsExplain and DeskPhrases now run in parallel (phrases translate the engine's own checked points), saving ~7 s before the rescue starts.
+
+## D15 — 2026-11-09 · Alchemy: on-chain verification of real-data payments (Base)
+- Alchemy does not list Kite chain, but supports Base mainnet (`https://base-mainnet.g.alchemy.com/v2/<key>`), where every real-data purchase settles in USDC.
+- After each purchase, `DataBuyer` checks the Base receipt in the background: success + a USDC `Transfer` of the **exact** charged amount **from the traveler's Passport wallet** (the provider's payTo is not known from kpass output, so the recipient is not checked). Results: ✓ verified, ✕ mismatch, … still checking (polls every 3 s for up to 90 s).
+- `ALCHEMY_API_KEY` (optional) selects Alchemy; without it the verifier uses `https://mainnet.base.org`, which allows ~5 req/s and refuses `eth_getLogs`.
+- Live check (`services/core/scripts/probe-base-verify.ts`, free): on a real recent Base USDC transfer the verifier returned `true` for the exact amount and `false` for amount + 1.
+- UI: "Real data bought via Kite" card (count, total, verified on Base, BaseScan links); API `GET /data/purchases`; `/health.dataVerifier`.

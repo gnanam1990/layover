@@ -17,6 +17,7 @@ import { DoNotBanner, RightsPanel } from "../../../components/rights";
 import { Timeline } from "../../../components/timeline";
 import { PassportHandoff } from "../../../components/passport";
 import { DemoPanel } from "../../../components/DemoPanel";
+import { DataReceipts } from "../../../components/DataReceipts";
 import { Caption, Card, ExtLink, Skeleton, StatusChip } from "../../../components/ui";
 
 const usd = (dollars: number): Money => ({ amountMinor: String(Math.round(dollars * 100)), currency: "USD" });
@@ -377,6 +378,7 @@ function Dashboard({
         <div className="grid content-start gap-6 lg:col-span-4">
           <SpendMeter session={detail.session} spent={detail.spent} />
           <AgentCard session={detail.session} />
+          <DataReceipts refreshKey={events.length} />
           <Timeline events={events} connected={connected} max={40} />
           <Link
             href={`/trips/${detail.trip.id}/timeline`}

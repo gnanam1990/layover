@@ -217,6 +217,12 @@ add({
   detail: sup ? `supports ${net}: ${sup.kinds.some((k) => k.network === net)}` : "unreachable",
 });
 if (env.REAL_DATA === "1") {
+  add({
+    name: "Base payment verifier",
+    ok: env.ALCHEMY_API_KEY ? true : "warn",
+    detail: env.ALCHEMY_API_KEY ? "Alchemy (Base mainnet)" : "Base public RPC (rate-limited ~5 req/s)",
+    fix: "Add ALCHEMY_API_KEY=... to .env for rate-limit-free on-chain checks of data payments",
+  });
   const probes = [
     "https://stabletravel.dev/api/flightaware/flights/UA123?ident_type=designator&max_pages=1",
     "https://hotels.use.x402atlas.com/search?query=Frankfurt%20airport",

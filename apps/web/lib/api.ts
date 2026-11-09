@@ -69,8 +69,27 @@ export interface TripDetail {
   pendingRebook: { bookingId: string; offer: Offer }[];
 }
 
+export interface DataPurchases {
+  enabled: boolean;
+  verifier: "alchemy" | "public-rpc" | null;
+  count: number;
+  totalUsd: string;
+  verified: number;
+  failed: number;
+  purchases: {
+    label: string;
+    url: string;
+    amount?: string;
+    tx?: string;
+    explorerUrl?: string;
+    atUtc: string;
+    verified?: boolean;
+  }[];
+}
+
 export const api = {
   health: () => req<Health>("/health"),
+  dataPurchases: () => req<DataPurchases>("/data/purchases"),
   trips: () => req<{ trip: Trip; session: SessionRecord | null }[]>("/trips"),
   trip: (id: string) => req<TripDetail>(`/trips/${id}`),
   timeline: (id: string) => req<TimelineEvent[]>(`/trips/${id}/timeline`),
