@@ -141,6 +141,10 @@ export class DropWatcher {
     const chosen = decisions.find((x) => x.d.allow) ?? decisions[0]!;
     const { o: offer, d: decision } = chosen;
 
+    // A rebook to this exact offer already ran (or is running): stay quiet, don't re-announce it every tick.
+    if (decision.allow && this.d.rebooker.state(Rebooker.idemKey(tripId, b.id, offer))) {
+      return { bookingId: b.id, action: "busy", decision };
+    }
     // Announce each distinct drop once (avoid spamming the timeline every tick).
     const sig = `${offer.hotelId}|${offer.price.amountMinor}|${decision.allow}|${decision.reasons.join(",")}`;
     if (!decision.allow && this.lastDenied.get(b.id) === sig)

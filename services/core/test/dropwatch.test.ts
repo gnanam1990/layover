@@ -124,6 +124,17 @@ describe("Dropwatch", () => {
       .at(-1)!;
     expect(err.detail).toContain("2026-12-21T12:00:00Z");
     expect(err.detail).toContain("manually");
+    // later ticks stay quiet about the offer already acted on
+    const before = w.types().length;
+    w.clock.advance(61_000);
+    await w.watcher.tick(w.trip.id);
+    await w.watcher.tick(w.trip.id);
+    expect(
+      w
+        .types()
+        .slice(before)
+        .filter((t) => t === "price_drop" || t === "policy_decision"),
+    ).toEqual([]);
   });
 
   test("refund not verified within 2 minutes → 'Refund pending', polling continues", async () => {
