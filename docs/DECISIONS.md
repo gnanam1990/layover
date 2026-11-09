@@ -14,7 +14,7 @@ Deviations from `docs/build-pack/` and spike evidence, newest last.
 | S3 | done | dynamic price supported; settle only on < 400 (D4) |
 | S4 | pending | needs ksearch |
 | S5 | pending | needs SERV_API_KEY (H1) |
-| S6 | pending | |
+| S6 | done | official texts checked; corrections in D8 |
 | S8 | pending | needs deployed merchant (H4) + kpass |
 | S9 | done | kpass 6.13.1 syntax recorded in D5 |
 
@@ -71,3 +71,19 @@ Deviations from `docs/build-pack/` and spike evidence, newest last.
 - EU261 band C delays of 3–4 h are emitted as "up to €600, VERIFY" because Art. 7(2)(c) may halve them.
 - US DOT meals/hotel appear only as "Airline commitment (DOT dashboard), check the airline" (MEDIUM), and only for controllable causes (technical, crew).
 - If NoticeParse fails, the engine still runs on the feed status and the timeline gets an error event. If RightsExplain fails its number post-check twice, a deterministic explanation built from the assessment is shown (`source: "deterministic"`).
+
+## D8 — 2026-11-09 · Spike S6: rule packs checked against official texts
+Checked against EUR-Lex (Reg. 261/2004, CELEX:32004R0261; CJEU Sturgeon C-402/07), UK CAA guidance, eCFR 14 CFR 260 (2026-10-01) and DGCA CAR Section 3 Series M Part IV **Rev 4 (25 Jan 2023, effective 15 Feb 2023)**. Pack versions are now `2026-11-09-s6`.
+| Rule | Before | After (official) |
+|---|---|---|
+| EU261 bands €250/€400/€600 | HIGH | **confirmed** |
+| EU261 long-haul 3–4 h delay | "up to €600", VERIFY | **€300** (Art. 7(2)(c) applied to delays by Sturgeon para 63), HIGH |
+| EU261 short-notice re-route exemption | VERIFY | told 7–14 days ahead: re-route ≤ 2 h early and < 4 h late; under 7 days: ≤ 1 h early and < 2 h late. Implemented assuming the same block time |
+| UK261 £220/£350/£520 | VERIFY | **confirmed** (CAA), plus **£260** for 3–4 h long-haul |
+| US significant change | max(dep, arr) delay | departing ≥ 3/6 h **earlier** or arriving ≥ 3/6 h **later**; Layover only sees delays, so it uses the arrival delay |
+| US refund timing | MEDIUM | confirmed: 7 business days (card) / 20 calendar days (other) |
+| DGCA cancellation compensation | notice < 14 days | notice **< 24 h** only; 24 h–2 weeks → alternate or refund only. Amounts ₹5k/₹7.5k/₹10k confirmed, still shown as "up to" (capped at fare + fuel charge) |
+| DGCA meals | flat 2 h | 2 h (block ≤ 2.5 h), 3 h (2.5–5 h), 4 h (> 5 h) |
+| DGCA alternate/refund for delays | 6 h | > 6 h, **domestic only** |
+| DGCA hotel | 24 h or overnight | > 24 h, or > 6 h for departures between 20:00 and 03:00 |
+Not modelled (out of demo scope): DGCA denied boarding (para 3.2) and downgrades (3.5.1).

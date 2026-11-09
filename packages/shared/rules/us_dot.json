@@ -1,6 +1,6 @@
 {
   "id": "us_dot",
-  "version": "2026-11-09",
+  "version": "2026-11-09-s6",
   "name": "US DOT automatic refund rule (14 CFR 260)",
   "officialUrl": "https://www.transportation.gov/airconsumer",
   "applies": {
@@ -13,7 +13,7 @@
   "delay": {
     "significantDomesticMin": 180,
     "significantInternationalMin": 360,
-    "measuredOn": "departure_or_arrival"
+    "measuredOn": "departure_earlier_or_arrival_later"
   },
   "care": {
     "airlineCommitmentOnly": true,
@@ -24,22 +24,41 @@
     "doNot": "Don't accept a voucher or credit if you want your cash refund.",
     "action": "Decline the rebooking or voucher if you want cash: the refund goes back to your original form of payment."
   },
-  "refundTiming": { "cardBusinessDays": 7, "otherCalendarDays": 20 },
+  "refundTiming": {
+    "cardBusinessDays": 7,
+    "otherCalendarDays": 20
+  },
   "evidenceNeeded": [
     "Booking confirmation and payment method",
     "Airline cancellation or schedule-change notice",
     "Proof you declined the alternative"
   ],
   "entries": [
-    { "key": "applies", "confidence": "HIGH", "source": "14 CFR 260.2" },
-    { "key": "refund.cancellation", "confidence": "HIGH", "source": "14 CFR 260.6" },
+    {
+      "key": "applies",
+      "confidence": "HIGH",
+      "source": "14 CFR 260.2"
+    },
+    {
+      "key": "refund.cancellation",
+      "confidence": "HIGH",
+      "source": "14 CFR 260.6: refund when the passenger rejects, is offered no alternative, or does not respond (S6)"
+    },
     {
       "key": "delay.significant",
       "confidence": "MEDIUM",
       "source": "14 CFR 260.2 (significant change definition)"
     },
-    { "key": "delay.measuredOn", "confidence": "VERIFY", "source": "14 CFR 260.2" },
-    { "key": "refund.timing", "confidence": "MEDIUM", "source": "14 CFR 260.6(c)" },
+    {
+      "key": "delay.measuredOn",
+      "confidence": "HIGH",
+      "source": "14 CFR 260.2 (eCFR 2026-10-01): departing ≥3/6 h earlier OR arriving ≥3/6 h later (S6)"
+    },
+    {
+      "key": "refund.timing",
+      "confidence": "HIGH",
+      "source": "14 CFR 260.6: 7 business days (credit card), 20 calendar days (other) (S6)"
+    },
     {
       "key": "compensation.none",
       "confidence": "HIGH",

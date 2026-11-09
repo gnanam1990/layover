@@ -1,6 +1,6 @@
 {
   "id": "in_dgca",
-  "version": "2026-11-09",
+  "version": "2026-11-09-s6",
   "name": "India DGCA CAR Section 3, Series M, Part IV",
   "officialUrl": "https://www.dgca.gov.in",
   "applies": {
@@ -8,20 +8,52 @@
     "domesticRegion": "IN"
   },
   "cancellation": {
-    "noCompensationIfNoticeDays": 14,
     "altFlightOrRefund": true,
     "blockTimeBands": [
-      { "maxMin": 60, "amount": 5000, "currency": "INR" },
-      { "maxMin": 120, "amount": 7500, "currency": "INR" },
-      { "maxMin": null, "amount": 10000, "currency": "INR" }
+      {
+        "maxMin": 60,
+        "amount": 5000,
+        "currency": "INR"
+      },
+      {
+        "maxMin": 120,
+        "amount": 7500,
+        "currency": "INR"
+      },
+      {
+        "maxMin": null,
+        "amount": 10000,
+        "currency": "INR"
+      }
     ],
-    "capNote": "Capped at the booked one-way basic fare plus fuel surcharge."
+    "capNote": "Capped at the booked one-way basic fare plus airline fuel charge, whichever is less; no compensation if an alternate flight is accepted.",
+    "noCompensationIfNoticeHours": 24,
+    "altOrRefundOnlyIfNoticeDays": 14
   },
   "delay": {
-    "mealsAfterMin": 120,
     "altOrRefundAfterMin": 360,
+    "cashCompensation": false,
+    "mealsByBlockTime": [
+      {
+        "maxBlockMin": 150,
+        "afterMin": 120
+      },
+      {
+        "maxBlockMin": 300,
+        "afterMin": 180
+      },
+      {
+        "maxBlockMin": null,
+        "afterMin": 240
+      }
+    ],
+    "altOrRefundDomesticOnly": true,
     "hotelAfterMin": 1440,
-    "cashCompensation": false
+    "hotelNightDeparture": {
+      "fromHour": 20,
+      "toHour": 3,
+      "afterMin": 360
+    }
   },
   "forceMajeureReasons": ["weather", "atc", "security", "strike"],
   "voucherWarning": {
@@ -35,11 +67,15 @@
     "Receipts for meals and hotel"
   ],
   "entries": [
-    { "key": "applies", "confidence": "MEDIUM", "source": "DGCA CAR Sec 3 Series M Part IV para 1" },
+    {
+      "key": "applies",
+      "confidence": "MEDIUM",
+      "source": "DGCA CAR Sec 3 Series M Part IV para 1"
+    },
     {
       "key": "cancellation.notice14",
-      "confidence": "MEDIUM",
-      "source": "DGCA CAR Sec 3 Series M Part IV para 3.6"
+      "confidence": "HIGH",
+      "source": "DGCA CAR Sec 3 Series M Part IV Rev 4 (2023-01-25) para 3.3.1: 24 h–2 weeks notice → alternate or refund only (S6)"
     },
     {
       "key": "cancellation.altOrRefund",
@@ -49,20 +85,32 @@
     {
       "key": "cancellation.compensationBands",
       "confidence": "VERIFY",
-      "source": "DGCA CAR Sec 3 Series M Part IV para 3.6.1(b)"
+      "source": "DGCA CAR Rev 4 para 3.3.2: ₹5,000/₹7,500/₹10,000 confirmed; shown as \"up to\" because capped at fare + fuel charge (S6)"
     },
     {
       "key": "forceMajeure",
       "confidence": "MEDIUM",
       "source": "DGCA CAR Sec 3 Series M Part IV para 3.6.1(c)"
     },
-    { "key": "delay.meals", "confidence": "MEDIUM", "source": "DGCA CAR Sec 3 Series M Part IV para 3.8" },
+    {
+      "key": "delay.meals",
+      "confidence": "HIGH",
+      "source": "DGCA CAR Rev 4 para 3.4: 2 h (block ≤2.5 h), 3 h (2.5–5 h), 4 h (>5 h) (S6)"
+    },
     {
       "key": "delay.altOrRefund",
-      "confidence": "MEDIUM",
-      "source": "DGCA CAR Sec 3 Series M Part IV para 3.8"
+      "confidence": "HIGH",
+      "source": "DGCA CAR Rev 4 para 3.4: domestic, delay > 6 h (S6)"
     },
-    { "key": "delay.hotel", "confidence": "MEDIUM", "source": "DGCA CAR Sec 3 Series M Part IV para 3.8" },
-    { "key": "voucher", "confidence": "MEDIUM", "source": "DGCA CAR Sec 3 Series M Part II (refunds)" }
+    {
+      "key": "delay.hotel",
+      "confidence": "HIGH",
+      "source": "DGCA CAR Rev 4 para 3.4: > 24 h, or > 6 h for 20:00–03:00 departures (S6)"
+    },
+    {
+      "key": "voucher",
+      "confidence": "MEDIUM",
+      "source": "DGCA CAR Sec 3 Series M Part II (refunds)"
+    }
   ]
 }
