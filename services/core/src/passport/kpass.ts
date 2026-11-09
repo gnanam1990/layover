@@ -117,7 +117,7 @@ export class KpassPassport implements PassportAdapter {
       const email = (get(j, "user.email") ?? get(j, "auth.email") ?? j.email) as string | undefined;
       const wallet = (get(j, "wallet.address") ?? j.wallet_address) as string | undefined;
       const mode = (get(j, "mode") ?? get(j, "sandbox.mode")) as string | undefined;
-      const loggedIn = Boolean(email ?? get(j, "auth.logged_in") ?? get(j, "logged_in"));
+      const loggedIn = get(j, "user.logged_in") === true || Boolean(email);
       return { loggedIn, ...(email && { email }), ...(wallet && { wallet }), sandbox: mode === "sandbox" };
     } catch (e) {
       if (e instanceof PassportError) return { loggedIn: false };
