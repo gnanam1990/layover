@@ -17,5 +17,11 @@
     "hono": "^4.13.17",
     "viem": "^2.57.17",
     "zod": "^4.6.7"
+  },
+  "main": "src/merchant.ts",
+  "exports": {
+    ".": "./src/merchant.ts",
+    "./sim-facilitator": "./src/sim-facilitator.ts",
+    "./config": "./src/config.ts"
   }
 }
