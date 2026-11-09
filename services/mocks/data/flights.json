@@ -1,0 +1,32 @@
+[
+  {
+    "id": "LH761-2026-12-20",
+    "carrier": "LH",
+    "number": "761",
+    "from": "FRA",
+    "to": "BLR",
+    "schedDepUtc": "2026-12-20T20:50:00Z",
+    "schedArrUtc": "2026-12-21T09:20:00Z",
+    "airlineCountry": "DE"
+  },
+  {
+    "id": "6E512-2026-12-21",
+    "carrier": "6E",
+    "number": "512",
+    "from": "BLR",
+    "to": "GOI",
+    "schedDepUtc": "2026-12-21T11:30:00Z",
+    "schedArrUtc": "2026-12-21T12:45:00Z",
+    "airlineCountry": "IN"
+  },
+  {
+    "id": "UA1782-2026-12-20",
+    "carrier": "UA",
+    "number": "1782",
+    "from": "SFO",
+    "to": "JFK",
+    "schedDepUtc": "2026-12-20T16:00:00Z",
+    "schedArrUtc": "2026-12-21T00:30:00Z",
+    "airlineCountry": "US"
+  }
+]
