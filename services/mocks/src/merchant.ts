@@ -248,7 +248,6 @@ export function createMerchantApp(over: Partial<MerchantDeps> = {}) {
   });
   app.post("/admin/reset", async (c) => {
     deps.state.reset();
-    await deps.notifySimulated("reset");
     return c.json({ ok: true });
   });
 
