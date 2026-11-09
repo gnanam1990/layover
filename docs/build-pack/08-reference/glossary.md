@@ -1,0 +1,12 @@
+# Glossary
+- **Kite Agent Passport** — Kite's account/wallet for agents; spending approved per **session** with a passkey.
+- **Session** — Kite spending authorization: per-tx cap, total cap, TTL, assets; errors like `session_rule_exceeded`.
+- **kpass / ksearch** — Kite CLIs (payments/sessions; service discovery).
+- **x402** — HTTP 402 payment protocol; merchant returns 402 + requirements, client pays, facilitator settles (EIP-3009 `transferWithAuthorization`).
+- **Facilitator** — service that verifies/settles x402 payments (Pieverse `/v2`).
+- **kite-x402-hono** — priority-repo reverse proxy that charges x402 on `/v1/*`.
+- **SERV Reasoning** — OpenServ's reasoning layer (OpenAI/Anthropic-compatible API) with `serv_prompt_guard`, `serv_shadow_agent`, Kronos (`-serv-kronos`).
+- **Rule pack** — JSON encoding of a passenger-rights regime (EU261, UK261, US DOT, DGCA) with confidence + sources.
+- **Care** — EU261 right to meals/hotel/transport during disruptions, owed even in extraordinary circumstances.
+- **PRICE_SCALE** — display/settle divisor for mainnet demos (e.g., $72 shown, $0.72 settled).
+- **PROVEN.md / DECISIONS.md** — evidence log of live txs / log of spikes and deviations.

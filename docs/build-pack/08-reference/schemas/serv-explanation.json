@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "serv-explanation.json",
+  "title": "serv-explanation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "headline",
+    "bullets",
+    "doNot",
+    "disclaimer"
+  ],
+  "properties": {
+    "headline": {
+      "type": "string"
+    },
+    "bullets": {
+      "type": "array",
+      "maxItems": 5,
+      "items": {
+        "type": "string"
+      }
+    },
+    "doNot": {
+      "type": "array",
+      "maxItems": 3,
+      "items": {
+        "type": "string"
+      }
+    },
+    "disclaimer": {
+      "type": "string"
+    }
+  }
+}

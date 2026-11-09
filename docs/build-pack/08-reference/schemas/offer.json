@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "offer.json",
+  "title": "offer",
+  "type": "object",
+  "required": [
+    "merchantId",
+    "hotelId",
+    "hotelName",
+    "checkIn",
+    "checkOut",
+    "price",
+    "refundable",
+    "payUrl"
+  ],
+  "properties": {
+    "merchantId": {
+      "type": "string"
+    },
+    "hotelId": {
+      "type": "string"
+    },
+    "hotelName": {
+      "type": "string"
+    },
+    "rating": {
+      "type": "number"
+    },
+    "roomClass": {
+      "type": "string"
+    },
+    "distanceKm": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "checkIn": {
+      "type": "string"
+    },
+    "checkOut": {
+      "type": "string"
+    },
+    "price": {
+      "$ref": "money.json"
+    },
+    "refundable": {
+      "type": "boolean"
+    },
+    "cancelDeadlineUtc": {
+      "type": "string"
+    },
+    "payUrl": {
+      "type": "string",
+      "format": "uri"
+    },
+    "rateTier": {
+      "type": "integer"
+    }
+  }
+}

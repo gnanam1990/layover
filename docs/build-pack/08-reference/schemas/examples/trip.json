@@ -1,0 +1,66 @@
+{
+  "id": "trip_demo",
+  "travelerName": "Priya",
+  "status": "protected",
+  "flights": [
+    {
+      "id": "LH761-2026-12-20",
+      "carrier": "LH",
+      "number": "761",
+      "from": "FRA",
+      "to": "BLR",
+      "schedDepUtc": "2026-12-20T20:50:00Z",
+      "schedArrUtc": "2026-12-21T09:20:00Z",
+      "bookingRef": "LH7Q2K",
+      "airlineCountry": "DE",
+      "status": {
+        "state": "scheduled",
+        "depDelayMin": 0,
+        "arrDelayMin": 0,
+        "noticeAtUtc": null,
+        "reasonText": null,
+        "reasonClass": null
+      }
+    }
+  ],
+  "hotelBookings": [
+    {
+      "id": "hb_1",
+      "merchantId": "mock-hotels",
+      "hotelId": "lumen-goa",
+      "hotelName": "Hotel Lumen Goa",
+      "rating": 4.2,
+      "roomClass": "standard",
+      "checkIn": "2026-12-22",
+      "checkOut": "2026-12-24",
+      "price": {
+        "amountMinor": "7200",
+        "currency": "USD"
+      },
+      "refundable": true,
+      "cancelDeadlineUtc": "2026-12-21T12:00:00Z",
+      "confirmation": "HX-2231",
+      "paymentTx": null,
+      "payer": null,
+      "status": "active"
+    }
+  ],
+  "settings": {
+    "autoRebook": true,
+    "minSaving": {
+      "amountMinor": "500",
+      "currency": "USD"
+    },
+    "autoRescue": true,
+    "emergencyBudget": {
+      "amountMinor": "15000",
+      "currency": "USD"
+    },
+    "maxPerBooking": {
+      "amountMinor": "12000",
+      "currency": "USD"
+    },
+    "maxHotelDistanceKm": 10,
+    "minRating": 3.5
+  }
+}

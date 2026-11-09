@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "serv-trip-draft.json",
+  "title": "serv-trip-draft",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "travelerName",
+    "flights",
+    "hotels",
+    "missing"
+  ],
+  "properties": {
+    "travelerName": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "flights": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "carrier",
+          "number",
+          "from",
+          "to",
+          "date",
+          "bookingRef"
+        ],
+        "properties": {
+          "carrier": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "number": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "from": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "to": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "date": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "bookingRef": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    "hotels": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "checkIn",
+          "checkOut",
+          "confirmation"
+        ],
+        "properties": {
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "checkIn": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "checkOut": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "confirmation": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    "missing": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

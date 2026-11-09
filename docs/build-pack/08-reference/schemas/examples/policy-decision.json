@@ -1,0 +1,47 @@
+{
+  "allow": true,
+  "action": "rebook",
+  "reasons": [],
+  "checks": [
+    {
+      "name": "session_active",
+      "pass": true,
+      "detail": "active until 2026-12-25T00:00Z"
+    },
+    {
+      "name": "max_per_tx",
+      "pass": true,
+      "detail": "$58.00 ≤ $120.00"
+    },
+    {
+      "name": "max_total",
+      "pass": true,
+      "detail": "$58.00 + $0.00 ≤ $270.00"
+    },
+    {
+      "name": "same_dates",
+      "pass": true,
+      "detail": "Dec 22–24"
+    },
+    {
+      "name": "room_class",
+      "pass": true,
+      "detail": "standard ≥ standard"
+    },
+    {
+      "name": "refundable",
+      "pass": true,
+      "detail": "free cancellation"
+    },
+    {
+      "name": "cancel_window",
+      "pass": true,
+      "detail": "old booking cancellable until Dec 21 12:00Z"
+    },
+    {
+      "name": "min_saving",
+      "pass": true,
+      "detail": "$14.00 ≥ $5.00"
+    }
+  ]
+}

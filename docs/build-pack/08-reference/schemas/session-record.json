@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "session-record.json",
+  "title": "session-record",
+  "type": "object",
+  "required": [
+    "id",
+    "requestId",
+    "maxPerTx",
+    "maxTotal",
+    "ttlUntilUtc",
+    "status"
+  ],
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "requestId": {
+      "type": "string"
+    },
+    "purpose": {
+      "const": "trip"
+    },
+    "maxPerTx": {
+      "$ref": "money.json"
+    },
+    "maxTotal": {
+      "$ref": "money.json"
+    },
+    "ttlUntilUtc": {
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "requested",
+        "active",
+        "expired",
+        "exhausted",
+        "rejected"
+      ]
+    },
+    "approvalUrl": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  }
+}
