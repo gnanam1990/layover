@@ -13,3 +13,4 @@ playwright-report
 test-results
 *.tsbuildinfo
 .claude/
+.next-dev
