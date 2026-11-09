@@ -1,0 +1,85 @@
+{
+  "id": "uk261",
+  "version": "2026-11-09",
+  "name": "UK retained Regulation 261",
+  "officialUrl": "https://www.caa.co.uk/passengers-and-public/your-rights/",
+  "applies": {
+    "departRegions": ["UK"],
+    "arriveRegions": ["UK"],
+    "arriveRequiresCarrierCountries": [
+      "GB",
+      "AT",
+      "BE",
+      "BG",
+      "HR",
+      "CY",
+      "CZ",
+      "DK",
+      "EE",
+      "FI",
+      "FR",
+      "DE",
+      "GR",
+      "HU",
+      "IE",
+      "IT",
+      "LV",
+      "LT",
+      "LU",
+      "MT",
+      "NL",
+      "PL",
+      "PT",
+      "RO",
+      "SK",
+      "SI",
+      "ES",
+      "SE"
+    ]
+  },
+  "bands": [
+    { "maxKm": 1500, "amount": 220, "currency": "GBP", "careAfterMin": 120 },
+    { "maxKm": 3500, "amount": 350, "currency": "GBP", "careAfterMin": 180 },
+    { "maxKm": null, "amount": 520, "currency": "GBP", "careAfterMin": 240 }
+  ],
+  "cancellation": {
+    "noCompensationIfNoticeDays": 14,
+    "refundOrReroute": true
+  },
+  "delay": {
+    "compensationArrivalDelayMin": 180,
+    "refundOrRerouteDepDelayMin": 300
+  },
+  "care": {
+    "meals": true,
+    "hotelIfOvernight": true,
+    "transport": true,
+    "selfBuyReimbursable": true
+  },
+  "extraordinaryReasons": ["weather", "atc", "security"],
+  "voucherWarning": {
+    "doNot": "Do not accept a voucher instead of cash unless you want it: a cash refund is the default.",
+    "action": "Ask the desk for a hotel first; if refused, we book it and you claim it back."
+  },
+  "evidenceNeeded": [
+    "Boarding pass or booking confirmation",
+    "Airline cancellation/delay notice",
+    "Receipts for meals, hotel and transport"
+  ],
+  "entries": [
+    { "key": "applies", "confidence": "HIGH", "source": "UK Reg. 261/2004 (retained) Art. 3" },
+    {
+      "key": "compensation.bands",
+      "confidence": "VERIFY",
+      "source": "UK Reg. 261/2004 (retained) Art. 7, amounts per CAA guidance"
+    },
+    { "key": "care.thresholds", "confidence": "MEDIUM", "source": "UK Reg. 261/2004 (retained) Art. 6" },
+    { "key": "cancellation.notice14", "confidence": "HIGH", "source": "UK Reg. 261/2004 (retained) Art. 5" },
+    { "key": "delay.arrival3h", "confidence": "HIGH", "source": "CAA guidance (Sturgeon applies)" },
+    { "key": "extraordinary", "confidence": "HIGH", "source": "UK Reg. 261/2004 (retained) Art. 5(3)" },
+    { "key": "care.hotel", "confidence": "HIGH", "source": "UK Reg. 261/2004 (retained) Art. 9" },
+    { "key": "care.meals", "confidence": "HIGH", "source": "UK Reg. 261/2004 (retained) Art. 9" },
+    { "key": "refundOrReroute", "confidence": "HIGH", "source": "UK Reg. 261/2004 (retained) Art. 8" },
+    { "key": "voucher", "confidence": "HIGH", "source": "UK Reg. 261/2004 (retained) Art. 7(3)" }
+  ]
+}

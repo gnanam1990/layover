@@ -17,3 +17,9 @@ Deviations from `docs/build-pack/` and spike evidence, newest last.
 | S6 | pending | |
 | S8 | pending | needs deployed merchant (H4) + kpass |
 | S9 | pending | needs kpass installed |
+
+## D2 — 2026-11-09 · M01 shared package layout
+- `airports.json` lives in `packages/shared/data/` (not `services/mocks/data/`) because the rights engine in core needs it too; mocks import it from `@layover/shared`.
+- Each zod schema and its inferred type share one name (e.g. `Trip` is both), exported from `schemas.ts`; there is no separate `types.ts`.
+- Rule packs are validated with the zod mirror of `rule-pack.schema.json` at import time (fail fast) and in tests.
+- Rule-pack confidence levels copy `00-context/03-passenger-rights-rules.md`; S6 (official-text check) will upgrade VERIFY rows.

@@ -1,0 +1,68 @@
+{
+  "id": "in_dgca",
+  "version": "2026-11-09",
+  "name": "India DGCA CAR Section 3, Series M, Part IV",
+  "officialUrl": "https://www.dgca.gov.in",
+  "applies": {
+    "carrierCountries": ["IN"],
+    "domesticRegion": "IN"
+  },
+  "cancellation": {
+    "noCompensationIfNoticeDays": 14,
+    "altFlightOrRefund": true,
+    "blockTimeBands": [
+      { "maxMin": 60, "amount": 5000, "currency": "INR" },
+      { "maxMin": 120, "amount": 7500, "currency": "INR" },
+      { "maxMin": null, "amount": 10000, "currency": "INR" }
+    ],
+    "capNote": "Capped at the booked one-way basic fare plus fuel surcharge."
+  },
+  "delay": {
+    "mealsAfterMin": 120,
+    "altOrRefundAfterMin": 360,
+    "hotelAfterMin": 1440,
+    "cashCompensation": false
+  },
+  "forceMajeureReasons": ["weather", "atc", "security", "strike"],
+  "voucherWarning": {
+    "doNot": "Don't accept a credit shell instead of a refund unless you want it.",
+    "action": "Ask for an alternate flight or a full refund in writing; complain on AirSewa if refused."
+  },
+  "complaintPortal": "https://airsewa.gov.in",
+  "evidenceNeeded": [
+    "E-ticket / PNR",
+    "Airline cancellation or delay message",
+    "Receipts for meals and hotel"
+  ],
+  "entries": [
+    { "key": "applies", "confidence": "MEDIUM", "source": "DGCA CAR Sec 3 Series M Part IV para 1" },
+    {
+      "key": "cancellation.notice14",
+      "confidence": "MEDIUM",
+      "source": "DGCA CAR Sec 3 Series M Part IV para 3.6"
+    },
+    {
+      "key": "cancellation.altOrRefund",
+      "confidence": "MEDIUM",
+      "source": "DGCA CAR Sec 3 Series M Part IV para 3.6"
+    },
+    {
+      "key": "cancellation.compensationBands",
+      "confidence": "VERIFY",
+      "source": "DGCA CAR Sec 3 Series M Part IV para 3.6.1(b)"
+    },
+    {
+      "key": "forceMajeure",
+      "confidence": "MEDIUM",
+      "source": "DGCA CAR Sec 3 Series M Part IV para 3.6.1(c)"
+    },
+    { "key": "delay.meals", "confidence": "MEDIUM", "source": "DGCA CAR Sec 3 Series M Part IV para 3.8" },
+    {
+      "key": "delay.altOrRefund",
+      "confidence": "MEDIUM",
+      "source": "DGCA CAR Sec 3 Series M Part IV para 3.8"
+    },
+    { "key": "delay.hotel", "confidence": "MEDIUM", "source": "DGCA CAR Sec 3 Series M Part IV para 3.8" },
+    { "key": "voucher", "confidence": "MEDIUM", "source": "DGCA CAR Sec 3 Series M Part II (refunds)" }
+  ]
+}
