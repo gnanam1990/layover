@@ -4,7 +4,10 @@ import { OffsetClock, systemClock, type Clock } from "./clock";
 import type { Config } from "./config";
 import { TimelineStore } from "./timeline/store";
 import { TripRepo } from "./trips/repo";
-import { createMerchantClient, type MerchantClient } from "./merchant/client";
+import { createMerchantClient, withRealFlights, type MerchantClient } from "./merchant/client";
+import { DataBuyer, purchaseLink } from "./realdata/buyer";
+import { RealFlights } from "./realdata/flights";
+import { RealHotels } from "./realdata/hotels";
 import { createChainVerifier, type ChainVerifier } from "./chain/verify";
 import type { PassportAdapter } from "./passport/adapter";
 import { KpassPassport } from "./passport/kpass";
@@ -31,6 +34,9 @@ export interface Services {
   sessions: SessionManager;
   serv: ServClient;
   servOffline: boolean;
+  realHotels?: RealHotels;
+  realFlights?: RealFlights;
+  buyer?: DataBuyer;
   rebooker: Rebooker;
   watcher: DropWatcher;
   claims: ClaimBuilder;
@@ -47,6 +53,7 @@ export interface ServiceOverrides {
   serv?: ServClient;
   chain?: ChainVerifier;
   sleep?: (ms: number) => Promise<void>;
+  dataBuyer?: DataBuyer;
 }
 
 /** Wires every core service from config; tests override the edges (fetch, passport, SERV, chain, clock). */
@@ -56,7 +63,7 @@ export function buildServices(cfg: Config, o: ServiceOverrides = {}): Services {
   const timeline = o.timeline ?? new TimelineStore(db, clock);
   const trips = new TripRepo(db, clock);
   const merchantFetch = o.merchantFetch ?? globalThis.fetch;
-  const merchant = createMerchantClient(cfg.merchantUrl, merchantFetch);
+  const baseMerchant = createMerchantClient(cfg.merchantUrl, merchantFetch);
   // With the fake payer nothing is on-chain, so the offline stack uses a simulated verifier (flagged in /health).
   const simulatedChain: ChainVerifier = {
     verifyPayment: async () => true,
@@ -82,6 +89,11 @@ export function buildServices(cfg: Config, o: ServiceOverrides = {}): Services {
             tokenDecimals: cfg.tokenDecimals,
           })
         : new KpassPassport());
+  // Real-data mode: flight status, airports and live hotel rates are bought from Kite's catalog.
+  const buyer = o.dataBuyer ?? (cfg.realData ? new DataBuyer(passport, clock) : undefined);
+  const realFlights = buyer ? new RealFlights(buyer, clock, cfg.realFlightTtlMs) : undefined;
+  const realHotels = buyer ? new RealHotels(buyer, clock, cfg.realHotelTtlMs) : undefined;
+  const merchant = realFlights ? withRealFlights(baseMerchant, realFlights) : baseMerchant;
   const sessions = new SessionManager({
     db,
     clock,
@@ -111,6 +123,7 @@ export function buildServices(cfg: Config, o: ServiceOverrides = {}): Services {
     ...(o.sleep && { sleep: o.sleep }),
   });
   const watcher = new DropWatcher({
+    ...(realHotels && { realHotels }),
     clock,
     timeline,
     trips,
@@ -121,6 +134,7 @@ export function buildServices(cfg: Config, o: ServiceOverrides = {}): Services {
   });
   const claims = new ClaimBuilder({ db, clock, timeline, trips, serv });
   const rescue = new RescueOrchestrator({
+    ...(realHotels && { realHotels }),
     clock,
     timeline,
     trips,
@@ -142,8 +156,17 @@ export function buildServices(cfg: Config, o: ServiceOverrides = {}): Services {
     merchant,
     serv,
     onDisruption: (info) => rescue.handle(info),
+    ...(realFlights && {
+      dataLinks: (id: string) => {
+        const p = realFlights.lastPurchase(id);
+        return p ? purchaseLink(p) : [];
+      },
+    }),
   });
   return {
+    ...(realHotels && { realHotels }),
+    ...(realFlights && { realFlights }),
+    ...(buyer && { buyer }),
     cfg,
     db,
     clock,

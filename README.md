@@ -38,6 +38,14 @@ Every call uses a system prompt, a strict `json_schema` response, zod validation
 - Refunds are verified on Kite chain by decoding the ERC-20 `Transfer` in the refund transaction (exact token, sender, recipient, amount).
 - Demo scale 1:100 on **Kite testnet** (display $72 → settles 0.72 pieUSD).
 
+## Real-data mode
+With `REAL_DATA=1` Layover **buys real data through Kite Passport**, each lookup a real x402 payment shown on the timeline with its receipt:
+- **Live flight status** from FlightAware ($0.01): add any real flight ("UA123 Nov 12") and Layover watches it; a real cancellation triggers the rights engine and the rescue flow.
+- **Live hotel rates** ($0.02–0.05): add a hotel you booked anywhere ("Hotel Adlon Berlin Dec 1–3, paid $640") and Layover alerts when the real rate drops. These hotels don't take agent payments, so this is watch-only: Layover tells you, you rebook.
+- At airports the bookable demo merchant doesn't cover, rescue shows **live hotel options** near the airport.
+
+This mode pays on Base mainnet (Passport live mode + a small allowance). Details: DECISIONS D12.
+
 ## What is proven
 Real transactions on Kite testnet are listed in **[docs/PROVEN.md](docs/PROVEN.md)** (Act 1 payment, Act 1 refund, Act 2 payment).
 

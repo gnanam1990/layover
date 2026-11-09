@@ -102,3 +102,31 @@ export function createMerchantClient(
     },
   };
 }
+
+/**
+ * Flights the mock feed doesn't know come from the real FlightAware feed (bought via Kite Passport).
+ * The mock feed keeps the scripted demo flights; real trips get real status.
+ */
+export function withRealFlights(
+  base: MerchantClient,
+  real: { info(id: string): Promise<MerchantFlight | null> },
+): MerchantClient {
+  return {
+    ...base,
+    async flightInfo(id) {
+      return (await base.flightInfo(id)) ?? (await real.info(id));
+    },
+    async flightStatus(id) {
+      try {
+        return await base.flightStatus(id);
+      } catch {
+        const f = await real.info(id);
+        if (!f) throw new Error(`flight ${id} not found`);
+        return f.status;
+      }
+    },
+    async flightNotice(id) {
+      return base.flightNotice(id).catch(() => "");
+    },
+  };
+}

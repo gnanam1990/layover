@@ -182,6 +182,7 @@ export const TIMELINE_TYPES = [
   "rescue_booked",
   "voucher_warning",
   "claim_ready",
+  "rescue_options",
   "error",
 ] as const;
 export const TimelineEventType = z.enum(TIMELINE_TYPES);
@@ -205,7 +206,15 @@ export const TripDraft = z.strictObject({
   flights: z.array(
     z.strictObject({ carrier: nstr, number: nstr, from: nstr, to: nstr, date: nstr, bookingRef: nstr }),
   ),
-  hotels: z.array(z.strictObject({ name: nstr, checkIn: nstr, checkOut: nstr, confirmation: nstr })),
+  hotels: z.array(
+    z.strictObject({
+      name: nstr,
+      checkIn: nstr,
+      checkOut: nstr,
+      confirmation: nstr,
+      pricePaid: z.number().nullable(),
+    }),
+  ),
   missing: z.array(z.string()),
 });
 export const NoticeFacts = z.strictObject({

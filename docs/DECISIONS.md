@@ -109,3 +109,17 @@ Found by running everything locally (PowerShell terminal + browser), not by the 
 - **Windows:** the offline launcher spawned `bun`/`pnpm` by name (fails outside Git Bash); it now uses the running Bun binary and `node …/next`. PowerShell may block `pnpm.ps1`; use `pnpm.cmd`.
 - **Offline mode leaked real config:** Bun auto-loads `.env`, so offline mode used the real merchant refund key. The launcher now drops every variable named in `.env.example` before starting.
 - Hotel-only trips no longer require a flight (offline intake stub); protect form inputs have proper labels and reject a $0 per-booking cap; copy-letter falls back when the clipboard API is blocked; the claim says why the standard letter was used; desk advice leads with hotel and meals; tap-to-rebook wording; top bar shape on phones.
+
+## D12 — 2026-11-09 · Real-data mode (`REAL_DATA=1`)
+Kite's catalog (`ksearch service search`) lists paid services Layover can buy through Kite Passport:
+| Data | Service | Price | Chain |
+|---|---|---|---|
+| Live flight status (FlightAware) | `stabletravel.dev/api/flightaware/flights/:ident` | $0.01 | Base USDC |
+| Airport coordinates + country | `api.sitecheck-api.workers.dev/api/airports` | $0.002 | Base USDC |
+| Live hotel search (rates, rating, GPS) | `hotels.use.x402atlas.com/search` | $0.05 | Base USDC |
+| Live rate for one hotel | `hotels.use.x402atlas.com/property` | $0.02 | Base USDC |
+- Probed unpaid with Layover's exact URLs (`services/core/scripts/probe-real-data.ts`): all answer 402 with the prices above.
+- Purchases go through `kpass session execute --use-allowance` (the owner's account allowance), never the trip session, because a Passport session locks to its first settled asset and hotel bookings settle on Kite.
+- **Real flights:** flights the mock feed doesn't know are fetched from FlightAware (cached `REAL_FLIGHT_TTL_MS`, default 10 min). Unknown airports are bought once from the airport service; their time zone is approximated from longitude (`Etc/GMT±N`) because that service has none.
+- **Real hotels are watch-only:** they don't accept agent payments, so Layover reports a real live-rate drop and links the hotel site; it never books or cancels them. Rescue at an airport the bookable merchant doesn't cover shows live options (≤ 15 km) to book yourself.
+- Real-data purchases are on **Base mainnet**, so this mode needs Passport live mode (`kpass sandbox off`) and a small allowance. The scripted demo hotels and LH761 stay on the mock merchant either way.

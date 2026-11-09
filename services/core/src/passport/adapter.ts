@@ -31,6 +31,8 @@ export interface ExecuteRequest {
   /** Stable per operation (e.g. tripId:bookingId:offerId); reused verbatim on retries. */
   idempotencyKey: string;
   sessionId?: string;
+  /** Pay from the owner's account allowance instead of the trip session (small real-data purchases). */
+  useAllowance?: boolean;
 }
 
 export interface PaymentInfo {

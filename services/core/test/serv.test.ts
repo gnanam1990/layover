@@ -45,7 +45,13 @@ const DRAFT = {
   travelerName: null,
   flights: [{ carrier: "LH", number: "761", from: "FRA", to: "BLR", date: "2026-12-20", bookingRef: null }],
   hotels: [
-    { name: "Hotel Lumen Goa", checkIn: "2026-12-20", checkOut: "2026-12-22", confirmation: "HX-2231" },
+    {
+      name: "Hotel Lumen Goa",
+      checkIn: "2026-12-20",
+      checkOut: "2026-12-22",
+      confirmation: "HX-2231",
+      pricePaid: null,
+    },
   ],
   missing: ["What is the traveler's name?"],
 };

@@ -331,6 +331,26 @@ function Dashboard({
             />
           )}
           {rebooked && !savings && !disruption && <p className="t-small text-muted">{rebooked.title}</p>}
+          {drop?.data && (drop.data as { watchOnly?: boolean }).watchOnly && (
+            <Card aria-label="Real price drop">
+              <p className="t-caption text-muted">Real price drop · live rate via Kite</p>
+              <p className="t-h2 mt-1">{drop.title}</p>
+              <p className="t-small mt-1 text-ink-2">{drop.detail}</p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {(drop.links ?? []).map((l) => (
+                  <a
+                    key={l.url}
+                    className="t-small text-olive-700 underline"
+                    href={l.url}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                  >
+                    {l.label} ↗
+                  </a>
+                ))}
+              </div>
+            </Card>
+          )}
           {capError && (
             <Card>
               <p className="text-warn">
@@ -389,6 +409,7 @@ function RescueBand({
   const state = flight?.status?.state === "cancelled" ? "cancelled" : "badly delayed";
   const vw = last(events, "voucher_warning");
   const booked = last(events, "rescue_booked");
+  const liveOptions = last(events, "rescue_options");
   const noHotel = [...events]
     .reverse()
     .find((e) => e.type === "error" && e.title === "No hotel within your limits");
@@ -446,6 +467,43 @@ function RescueBand({
             >
               Book it for {money(detail.pendingRescue.options[0]!.price)}
             </button>
+          </>
+        ) : liveOptions ? (
+          <>
+            <p className="mt-1 text-ink">{liveOptions.title}</p>
+            <ul className="mt-2 divide-y divide-line">
+              {(
+                (
+                  liveOptions.data as {
+                    options?: {
+                      name: string;
+                      totalUsd: number | null;
+                      rating: number | null;
+                      km: number | null;
+                      link: string | null;
+                    }[];
+                  }
+                ).options ?? []
+              ).map((o) => (
+                <li key={o.name} className="flex flex-wrap items-center gap-3 py-2">
+                  <span className="font-medium text-ink">{o.name}</span>
+                  {o.totalUsd !== null && <span className="mono">${o.totalUsd.toFixed(2)}</span>}
+                  {o.rating !== null && <span className="t-small text-muted">{o.rating}★</span>}
+                  {o.km !== null && <span className="t-small text-muted">{o.km} km</span>}
+                  {o.link && (
+                    <a
+                      className="t-small text-olive-700 underline"
+                      href={o.link}
+                      target="_blank"
+                      rel="noreferrer noopener"
+                    >
+                      Book on the hotel site
+                    </a>
+                  )}
+                </li>
+              ))}
+            </ul>
+            <p className="t-small mt-2 text-muted">{liveOptions.detail}</p>
           </>
         ) : noHotel ? (
           <p className="mt-1 text-warn">{noHotel.detail}</p>

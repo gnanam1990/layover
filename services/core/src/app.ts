@@ -101,6 +101,7 @@ export function createApp(o: CreateAppOpts = {}) {
       network: s.cfg.network,
       priceScale: s.cfg.priceScale,
       demoMode: s.cfg.demoMode,
+      realData: !!s.buyer,
     });
   });
 
@@ -116,7 +117,7 @@ export function createApp(o: CreateAppOpts = {}) {
     const { text } = IntakeBody.parse(await c.req.json());
     const draft = await tripIntake(s.serv, text);
     const id = `trip_${crypto.randomUUID().slice(0, 8)}`;
-    const r = await assembleTrip(draft, s.merchant, id);
+    const r = await assembleTrip(draft, s.merchant, id, s.realHotels);
     return c.json({
       draft,
       ...(r.ok ? { trip: r.trip, missing: [] } : { trip: null, missing: r.missing }),

@@ -22,6 +22,10 @@ export interface Config {
   /** Demo clock start (e.g. 2026-12-20T19:30:00Z) so the December trip is "today" during recording. */
   demoNow?: string;
   dropwatchMs: number;
+  /** Buy real flight status and live hotel rates from Kite's catalog (needs Passport live mode + allowance). */
+  realData: boolean;
+  realFlightTtlMs: number;
+  realHotelTtlMs: number;
   flightPollMs: number;
   port: number;
 }
@@ -65,6 +69,9 @@ export function loadConfig(env: Record<string, string | undefined> = process.env
     dbPath: env.LAYOVER_DB || "layover.db",
     ...(env.DEMO_NOW && { demoNow: env.DEMO_NOW }),
     dropwatchMs: Number(env.DROPWATCH_INTERVAL_MS ?? 15000),
+    realData: env.REAL_DATA === "1",
+    realFlightTtlMs: Number(env.REAL_FLIGHT_TTL_MS ?? 10 * 60_000),
+    realHotelTtlMs: Number(env.REAL_HOTEL_TTL_MS ?? 60 * 60_000),
     flightPollMs: Number(env.FLIGHT_POLL_MS ?? 5000),
     port: Number(env.CORE_PORT ?? 8787),
   };

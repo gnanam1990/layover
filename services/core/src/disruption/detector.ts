@@ -32,6 +32,8 @@ export interface DetectorDeps {
   serv: ServClient;
   onDisruption: (info: DisruptionInfo) => Promise<void>;
   windowMs?: number;
+  /** Real-data mode: receipt links for the paid status lookup. */
+  dataLinks?: (flightId: string) => { label: string; url: string }[];
 }
 
 const WINDOW_MS = 48 * 3600_000;
@@ -82,6 +84,7 @@ export class DisruptionDetector {
           type: "flight_status",
           title: `${f.carrier}${f.number} ${f.from}→${f.to}: ${status.state}${status.depDelayMin ? ` (+${status.depDelayMin} min)` : ""}`,
           data: { flightId: f.id, status },
+          ...(this.d.dataLinks && { links: this.d.dataLinks(f.id) }),
         });
       }
       const disrupted =
