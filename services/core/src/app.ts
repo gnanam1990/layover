@@ -102,6 +102,7 @@ export function createApp(o: CreateAppOpts = {}) {
       priceScale: s.cfg.priceScale,
       demoMode: s.cfg.demoMode,
       realData: !!s.buyer,
+      dataVerifier: s.buyer?.verifierSource ?? null,
     });
   });
 
@@ -219,6 +220,21 @@ export function createApp(o: CreateAppOpts = {}) {
   });
 
   app.get("/trips/:id/timeline", (c) => c.json(s.timeline.list(c.req.param("id"))));
+
+  /** Real-data purchases (each a Kite Passport payment on Base) and their on-chain verification. */
+  app.get("/data/purchases", (c) => {
+    const list = s.buyer?.purchases ?? [];
+    const micros = list.reduce((acc, p) => acc + (p.amount ? Math.round(Number(p.amount) * 1e6) : 0), 0);
+    return c.json({
+      enabled: !!s.buyer,
+      verifier: s.buyer?.verifierSource ?? null,
+      count: list.length,
+      totalUsd: (micros / 1e6).toFixed(3),
+      verified: list.filter((p) => p.verified === true).length,
+      failed: list.filter((p) => p.verified === false).length,
+      purchases: [...list].reverse().slice(0, 50),
+    });
+  });
 
   // ---------------- live events (SSE, resumable) ----------------
   app.get("/events", (c) => {

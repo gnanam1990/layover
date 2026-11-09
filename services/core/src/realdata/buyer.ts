@@ -2,6 +2,8 @@ import type { ZodType } from "zod";
 import type { Clock } from "../clock";
 import type { PassportAdapter } from "../passport/adapter";
 import { PassportError } from "../passport/errors";
+import { usdToMicros } from "../passport/adapter";
+import { BASE_CHAIN_ID, type PaymentVerifier } from "./base-verify";
 
 export interface DataPurchase {
   label: string;
@@ -11,6 +13,8 @@ export interface DataPurchase {
   chainId?: number;
   explorerUrl?: string;
   atUtc: string;
+  /** On-chain check of the payment (Base receipt): true/false once known, absent while pending or unverifiable. */
+  verified?: boolean;
 }
 
 export class DataUnavailableError extends Error {
@@ -34,12 +38,55 @@ const EXPLORERS: Record<number, string> = {
  * Buys real data from Kite's paid-service catalog. Every call is an x402 payment through Kite Passport,
  * paid from the owner's account allowance so it never touches the trip's booking session (asset lock).
  */
+export interface BuyerVerification {
+  verifier: PaymentVerifier;
+  /** The traveler's Passport wallet (the payer on-chain). */
+  payer: () => Promise<string | undefined>;
+  pollMs?: number;
+  timeoutMs?: number;
+  sleep?: (ms: number) => Promise<void>;
+}
+
 export class DataBuyer {
   readonly purchases: DataPurchase[] = [];
+  private pendingChecks = new Set<Promise<void>>();
   constructor(
     private passport: PassportAdapter,
     private clock: Clock,
+    private verification?: BuyerVerification,
   ) {}
+
+  get verifierSource() {
+    return this.verification?.verifier.source ?? null;
+  }
+
+  /** Resolves when every started on-chain check has finished (tests, shutdown). */
+  async settled() {
+    await Promise.all([...this.pendingChecks]);
+  }
+
+  private startVerification(p: DataPurchase) {
+    const v = this.verification;
+    if (!v || !p.tx || p.chainId !== BASE_CHAIN_ID || !p.amount) return;
+    const sleep = v.sleep ?? ((ms: number) => new Promise<void>((r) => setTimeout(r, ms)));
+    const run = (async () => {
+      const from = await v.payer().catch(() => undefined);
+      if (!from) return;
+      const amountAtomic = usdToMicros(p.amount!); // USDC has 6 decimals, same as our micros
+      const deadline = Date.now() + (v.timeoutMs ?? 90_000);
+      for (;;) {
+        const ok = await v.verifier.verify(p.tx!, { from, amountAtomic }).catch(() => null);
+        if (ok !== null) {
+          p.verified = ok;
+          return;
+        }
+        if (Date.now() >= deadline) return;
+        await sleep(v.pollMs ?? 3_000);
+      }
+    })();
+    this.pendingChecks.add(run);
+    void run.finally(() => this.pendingChecks.delete(run));
+  }
 
   async get<T>(url: string, schema: ZodType<T>, label: string): Promise<{ data: T; purchase: DataPurchase }> {
     let r;
@@ -72,6 +119,7 @@ export class DataBuyer {
       atUtc: this.clock.now().toISOString(),
     };
     this.purchases.push(purchase);
+    this.startVerification(purchase);
     return { data: parsed.data, purchase };
   }
 }

@@ -44,7 +44,7 @@ With `REAL_DATA=1` Layover **buys real data through Kite Passport**, each lookup
 - **Live hotel rates** ($0.02–0.05): add a hotel you booked anywhere ("Hotel Adlon Berlin Dec 1–3, paid $640") and Layover alerts when the real rate drops. These hotels don't take agent payments, so this is watch-only: Layover tells you, you rebook.
 - At airports the bookable demo merchant doesn't cover, rescue shows **live hotel options** near the airport.
 
-This mode pays on Base mainnet (Passport live mode + a small allowance). Details: DECISIONS D12.
+This mode pays on Base mainnet (Passport live mode + a small allowance). **Every data payment is then verified on-chain** (exact USDC amount from your Passport wallet) via Alchemy, or Base's public RPC when no `ALCHEMY_API_KEY` is set. Details: DECISIONS D12, D15.
 
 ## What is proven
 Real transactions on Kite testnet are listed in **[docs/PROVEN.md](docs/PROVEN.md)** (Act 1 payment, Act 1 refund, Act 2 payment).
