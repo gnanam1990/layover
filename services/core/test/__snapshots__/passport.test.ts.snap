@@ -1,0 +1,12 @@
+// Bun Snapshot v1, https://bun.sh/docs/test/snapshots
+
+exports[`kpass argv switching the verb table changes only the verbs (snapshot) 1`] = `
+[
+  "session",
+  "create",
+  "--separate",
+  "--output",
+  "json",
+  "--no-interactive",
+]
+`;

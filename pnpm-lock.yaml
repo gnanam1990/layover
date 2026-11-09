@@ -81,6 +81,10 @@ importers:
       zod:
         specifier: ^4.6.7
         version: 4.6.7
+    devDependencies:
+      '@layover/mocks':
+        specifier: workspace:*
+        version: link:../mocks
 
   services/mocks:
     dependencies:
