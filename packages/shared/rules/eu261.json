@@ -1,6 +1,6 @@
 {
   "id": "eu261",
-  "version": "2026-11-09",
+  "version": "2026-11-09-s6",
   "name": "EU Regulation (EC) 261/2004",
   "officialUrl": "https://eur-lex.europa.eu/eli/reg/2004/261/oj",
   "applies": {
@@ -41,18 +41,50 @@
     ]
   },
   "bands": [
-    { "maxKm": 1500, "amount": 250, "currency": "EUR", "careAfterMin": 120 },
-    { "maxKm": 3500, "amount": 400, "currency": "EUR", "careAfterMin": 180 },
-    { "maxKm": null, "amount": 600, "currency": "EUR", "careAfterMin": 240 }
+    {
+      "maxKm": 1500,
+      "amount": 250,
+      "currency": "EUR",
+      "careAfterMin": 120
+    },
+    {
+      "maxKm": 3500,
+      "amount": 400,
+      "currency": "EUR",
+      "careAfterMin": 180
+    },
+    {
+      "maxKm": null,
+      "amount": 600,
+      "currency": "EUR",
+      "careAfterMin": 240
+    }
   ],
   "intraEuOver1500UsesBand": 1,
   "cancellation": {
     "noCompensationIfNoticeDays": 14,
-    "refundOrReroute": true
+    "refundOrReroute": true,
+    "rerouteExemptions": [
+      {
+        "minNoticeDays": 7,
+        "maxEarlyMin": 120,
+        "maxLateMin": 240
+      },
+      {
+        "minNoticeDays": 0,
+        "maxEarlyMin": 60,
+        "maxLateMin": 120
+      }
+    ]
   },
   "delay": {
     "compensationArrivalDelayMin": 180,
-    "refundOrRerouteDepDelayMin": 300
+    "refundOrRerouteDepDelayMin": 300,
+    "longHaulReduction": {
+      "appliesToBandIndex": 2,
+      "arrivalDelayBelowMin": 240,
+      "bps": 5000
+    }
   },
   "care": {
     "meals": true,
@@ -71,21 +103,65 @@
     "Receipts for meals, hotel and transport"
   ],
   "entries": [
-    { "key": "applies", "confidence": "HIGH", "source": "Reg. 261/2004 Art. 3(1)" },
-    { "key": "compensation.bands", "confidence": "HIGH", "source": "Reg. 261/2004 Art. 7(1)" },
-    { "key": "care.thresholds", "confidence": "MEDIUM", "source": "Reg. 261/2004 Art. 6(1)" },
-    { "key": "cancellation.notice14", "confidence": "HIGH", "source": "Reg. 261/2004 Art. 5(1)(c)(i)" },
+    {
+      "key": "applies",
+      "confidence": "HIGH",
+      "source": "Reg. 261/2004 Art. 3(1)"
+    },
+    {
+      "key": "compensation.bands",
+      "confidence": "HIGH",
+      "source": "Reg. 261/2004 Art. 7(1) — confirmed on EUR-Lex CELEX:32004R0261 (S6)"
+    },
+    {
+      "key": "care.thresholds",
+      "confidence": "MEDIUM",
+      "source": "Reg. 261/2004 Art. 6(1)"
+    },
+    {
+      "key": "cancellation.notice14",
+      "confidence": "HIGH",
+      "source": "Reg. 261/2004 Art. 5(1)(c)(i)"
+    },
     {
       "key": "cancellation.shortNoticeRerouteExemption",
-      "confidence": "VERIFY",
-      "source": "Reg. 261/2004 Art. 5(1)(c)(ii)-(iii)"
+      "confidence": "HIGH",
+      "source": "Reg. 261/2004 Art. 5(1)(c)(ii)-(iii): 7–14 days: ≤2 h early, <4 h late; <7 days: ≤1 h early, <2 h late (S6)"
     },
-    { "key": "delay.arrival3h", "confidence": "HIGH", "source": "CJEU Sturgeon C-402/07 and C-432/07" },
-    { "key": "delay.longhaul50pct", "confidence": "VERIFY", "source": "Reg. 261/2004 Art. 7(2)(c)" },
-    { "key": "extraordinary", "confidence": "HIGH", "source": "Reg. 261/2004 Art. 5(3), recital 14" },
-    { "key": "care.hotel", "confidence": "HIGH", "source": "Reg. 261/2004 Art. 9(1)(b)-(c)" },
-    { "key": "care.meals", "confidence": "HIGH", "source": "Reg. 261/2004 Art. 9(1)(a)" },
-    { "key": "refundOrReroute", "confidence": "HIGH", "source": "Reg. 261/2004 Art. 8" },
-    { "key": "voucher", "confidence": "HIGH", "source": "Reg. 261/2004 Art. 7(3)" }
+    {
+      "key": "delay.arrival3h",
+      "confidence": "HIGH",
+      "source": "CJEU Sturgeon C-402/07 and C-432/07"
+    },
+    {
+      "key": "delay.longhaul50pct",
+      "confidence": "HIGH",
+      "source": "Reg. 261/2004 Art. 7(2)(c) applied to delays by CJEU Sturgeon C-402/07 para 63 (S6)"
+    },
+    {
+      "key": "extraordinary",
+      "confidence": "HIGH",
+      "source": "Reg. 261/2004 Art. 5(3), recital 14"
+    },
+    {
+      "key": "care.hotel",
+      "confidence": "HIGH",
+      "source": "Reg. 261/2004 Art. 9(1)(b)-(c)"
+    },
+    {
+      "key": "care.meals",
+      "confidence": "HIGH",
+      "source": "Reg. 261/2004 Art. 9(1)(a)"
+    },
+    {
+      "key": "refundOrReroute",
+      "confidence": "HIGH",
+      "source": "Reg. 261/2004 Art. 8"
+    },
+    {
+      "key": "voucher",
+      "confidence": "HIGH",
+      "source": "Reg. 261/2004 Art. 7(3)"
+    }
   ]
 }

@@ -118,6 +118,9 @@ interface Ctx {
   noticeDays: number;
   overnight: boolean;
   declined: boolean;
+  facts: NoticeFacts | null;
+  /** Local hour (0–23) of the scheduled departure at the origin airport. */
+  depLocalHour: number;
 }
 
 function entitlement(
@@ -137,6 +140,28 @@ function entitlement(
     basis,
     sourceUrl: p.officialUrl,
   };
+}
+
+/** Art. 5(1)(c)(ii)-(iii): short-notice cancellations are exempt when the offered re-route is close enough in time. */
+function rerouteExempt(p: RulePack, x: Ctx): boolean {
+  const windows = (
+    Array.isArray(rec(p.cancellation).rerouteExemptions) ? rec(p.cancellation).rerouteExemptions : []
+  ) as {
+    minNoticeDays: number;
+    maxEarlyMin: number;
+    maxLateMin: number;
+  }[];
+  const w = [...windows]
+    .sort((a, b) => b.minNoticeDays - a.minNoticeDays)
+    .find((v) => x.noticeDays >= v.minNoticeDays);
+  if (!w) return false;
+  const dep = Date.parse(x.flight.schedDepUtc);
+  return (x.facts?.offeredAlternatives ?? []).some((alt) => {
+    const t = parseAlternativeTime(alt);
+    if (!t) return false;
+    const shiftMin = (Date.parse(t) - dep) / 60_000; // same block time assumed, so arrival shifts equally
+    return -shiftMin <= w.maxEarlyMin && shiftMin < w.maxLateMin;
+  });
 }
 
 function euLike(p: RulePack, x: Ctx): PackAssessment | null {
@@ -177,7 +202,8 @@ function euLike(p: RulePack, x: Ctx): PackAssessment | null {
       entitlement(p, "reroute", "refundOrReroute", `${label} Art. 8: re-routing at the earliest opportunity`),
     );
     const notice = num(rec(p.cancellation).noCompensationIfNoticeDays, 14);
-    if (x.noticeDays < notice && !extraordinary) {
+    const exempt = rerouteExempt(p, x);
+    if (x.noticeDays < notice && !extraordinary && !exempt) {
       ents.push(
         entitlement(
           p,
@@ -215,16 +241,19 @@ function euLike(p: RulePack, x: Ctx): PackAssessment | null {
   } else {
     const dl = rec(p.delay);
     if (x.arrDelay >= num(dl.compensationArrivalDelayMin, 180) && !extraordinary) {
-      const longHaulMaybeHalved = band.maxKm === null && !intra && x.arrDelay < 240;
+      const red = rec(dl.longHaulReduction);
+      const reduced =
+        bandIdx === num(red.appliesToBandIndex, 2) &&
+        !intra &&
+        x.arrDelay < num(red.arrivalDelayBelowMin, 240);
       ents.push(
-        longHaulMaybeHalved
+        reduced
           ? entitlement(
               p,
               "compensation",
               "delay.longhaul50pct",
-              `${label} Art. 7(2)(c): band C, may be reduced by 50 % for a 3–4 h delay`,
-              comp,
-              "VERIFY",
+              `${label} Art. 7(2)(c) (Sturgeon para 63): band C reduced by 50 % for a 3–4 h arrival delay`,
+              minor((band.amount * num(red.bps, 5000)) / 10000, band.currency),
             )
           : entitlement(
               p,
@@ -305,13 +334,13 @@ function usDot(p: RulePack, x: Ctx): PackAssessment | null {
         "14 CFR 260.6: automatic cash refund to your original payment if you decline the alternative, whatever the cause",
       ),
     );
-  } else if (Math.max(x.depDelay, x.arrDelay) >= threshold) {
+  } else if (x.arrDelay >= threshold) {
     ents.push(
       entitlement(
         p,
         "refund",
         "delay.significant",
-        `14 CFR 260.2: significant change (${domestic ? "3" : "6"} h+), refund if you decline travel`,
+        `14 CFR 260.2: significant change (arriving ${domestic ? "3" : "6"} h+ late), refund if you decline travel`,
       ),
     );
   }
@@ -362,7 +391,7 @@ function inDgca(p: RulePack, x: Ctx): PackAssessment | null {
     ents.push(
       entitlement(p, "reroute", "cancellation.altOrRefund", "DGCA CAR S3 M IV 3.6: alternate flight"),
     );
-    if (x.noticeDays < num(c.noCompensationIfNoticeDays, 14) && !force) {
+    if (x.noticeDays * 24 < num(c.noCompensationIfNoticeHours, 24) && !force) {
       const block = (Date.parse(x.flight.schedArrUtc) - Date.parse(x.flight.schedDepUtc)) / 60_000;
       const bands = (Array.isArray(c.blockTimeBands) ? c.blockTimeBands : []) as {
         maxMin: number | null;
@@ -376,35 +405,56 @@ function inDgca(p: RulePack, x: Ctx): PackAssessment | null {
             p,
             "compensation",
             "cancellation.compensationBands",
-            `DGCA CAR S3 M IV 3.6.1: block time ${Math.floor(block / 60)} h ${Math.round(block % 60)} m. ${str(c.capNote)}`,
+            `DGCA CAR S3 M IV 3.3.2: under 24 h notice, block time ${Math.floor(block / 60)} h ${Math.round(block % 60)} m. ${str(c.capNote)}`,
             minor(band.amount, band.currency),
           ),
         );
       }
     }
   } else {
-    if (x.depDelay >= num(dl.mealsAfterMin, 120))
-      ents.push(entitlement(p, "care_meal", "delay.meals", "DGCA CAR S3 M IV 3.8: meals and refreshments"));
-    if (x.depDelay >= num(dl.altOrRefundAfterMin, 360)) {
+    const block = (Date.parse(x.flight.schedArrUtc) - Date.parse(x.flight.schedDepUtc)) / 60_000;
+    const meals = (Array.isArray(dl.mealsByBlockTime) ? dl.mealsByBlockTime : []) as {
+      maxBlockMin: number | null;
+      afterMin: number;
+    }[];
+    const mealAfter = meals.find((m) => m.maxBlockMin === null || block <= m.maxBlockMin)?.afterMin ?? 120;
+    if (x.depDelay >= mealAfter)
       ents.push(
-        entitlement(p, "refund", "delay.altOrRefund", "DGCA CAR S3 M IV 3.8: refund after a 6 h delay"),
+        entitlement(
+          p,
+          "care_meal",
+          "delay.meals",
+          `DGCA CAR S3 M IV 3.4: meals after a ${mealAfter / 60} h delay`,
+        ),
+      );
+    const altOk = !dl.altOrRefundDomesticOnly || domestic;
+    if (altOk && x.depDelay > num(dl.altOrRefundAfterMin, 360)) {
+      ents.push(
+        entitlement(
+          p,
+          "refund",
+          "delay.altOrRefund",
+          "DGCA CAR S3 M IV 3.4: refund after a 6 h delay (domestic)",
+        ),
       );
       ents.push(
         entitlement(
           p,
           "reroute",
           "delay.altOrRefund",
-          "DGCA CAR S3 M IV 3.8: alternate flight after a 6 h delay",
+          "DGCA CAR S3 M IV 3.4: alternate flight after a 6 h delay (domestic)",
         ),
       );
     }
-    if (x.depDelay >= num(dl.hotelAfterMin, 1440) || x.overnight) {
+    const night = rec(dl.hotelNightDeparture);
+    const nightDep = x.depLocalHour >= num(night.fromHour, 20) || x.depLocalHour < num(night.toHour, 3);
+    if (x.depDelay > num(dl.hotelAfterMin, 1440) || (nightDep && x.depDelay > num(night.afterMin, 360))) {
       ents.push(
         entitlement(
           p,
           "care_hotel",
           "delay.hotel",
-          "DGCA CAR S3 M IV 3.8: hotel for a long or overnight delay",
+          "DGCA CAR S3 M IV 3.4: hotel for a delay over 24 h, or over 6 h for a 20:00–03:00 departure",
         ),
       );
     }
@@ -461,6 +511,8 @@ export function assess(input: AssessInput): RightsAssessment | null {
     noticeDays,
     overnight: overnightNeeded(flight, status, facts).needed,
     declined: input.declinedAlternative ?? false,
+    facts,
+    depLocalHour: localParts(flight.schedDepUtc, AIRPORTS[flight.from]?.tz ?? "UTC").hour,
   };
 
   const out = [
