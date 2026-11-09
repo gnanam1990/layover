@@ -82,6 +82,17 @@ describe("TimelineStore", () => {
     expect(timeline.append({ tripId: "t9", type: "flight_status", title: "any" }).simulated).toBe(true);
   });
 
+  test("only simulated-world events are flagged; Layover's own actions (payments, refunds) never are", () => {
+    const { timeline } = setup();
+    timeline.markSimulated("*");
+    expect(timeline.append({ tripId: "t1", type: "price_drop", title: "drop" }).simulated).toBe(true);
+    expect(timeline.append({ tripId: "t1", type: "payment", title: "paid" }).simulated).toBe(false);
+    expect(timeline.append({ tripId: "t1", type: "refund_verified", title: "refund" }).simulated).toBe(false);
+    expect(timeline.append({ tripId: "t1", type: "session_active", title: "approved" }).simulated).toBe(
+      false,
+    );
+  });
+
   test("rejects unknown event types", () => {
     const { timeline } = setup();
     // @ts-expect-error invalid type on purpose

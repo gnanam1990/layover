@@ -57,12 +57,20 @@ export function buildServices(cfg: Config, o: ServiceOverrides = {}): Services {
   const trips = new TripRepo(db, clock);
   const merchantFetch = o.merchantFetch ?? globalThis.fetch;
   const merchant = createMerchantClient(cfg.merchantUrl, merchantFetch);
+  // With the fake payer nothing is on-chain, so the offline stack uses a simulated verifier (flagged in /health).
+  const simulatedChain: ChainVerifier = {
+    verifyPayment: async () => true,
+    verifyRefund: async (tx) => /^0x[0-9a-f]{64}$/i.test(tx),
+    explorerTx: (tx) => `https://testnet.kitescan.ai/tx/${tx}`,
+  };
   const chain =
     o.chain ??
-    createChainVerifier({
-      network: cfg.network,
-      ...(process.env.KITE_RPC_URL && { rpcUrl: process.env.KITE_RPC_URL }),
-    });
+    (cfg.payer === "fake"
+      ? simulatedChain
+      : createChainVerifier({
+          network: cfg.network,
+          ...(process.env.KITE_RPC_URL && { rpcUrl: process.env.KITE_RPC_URL }),
+        }));
   const passport: PassportAdapter =
     o.passport ??
     (cfg.payer === "fake"

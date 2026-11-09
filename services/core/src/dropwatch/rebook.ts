@@ -240,7 +240,7 @@ export class Rebooker {
           type: "refund_verified",
           title: `Saved ${formatMoney(saving)} · fee ${formatMoney(fee)}`,
           detail: `Refund of ${formatMoney(old.price)} verified on-chain. You keep ${formatMoney(keep)}.`,
-          data: { saving, fee, keep, refundTx: c.refundTx },
+          data: { saving, fee, keep, refunded: old.price, refundTx: c.refundTx },
           links: [{ label: "Refund on KiteScan", url: this.d.chain.explorerTx(c.refundTx) }],
         });
         return { state: "DONE", newBookingId: newId, ...(tx && { paymentTx: tx }), refundTx: c.refundTx };

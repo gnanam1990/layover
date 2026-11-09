@@ -27,6 +27,16 @@ interface Row {
 }
 
 export const SIMULATED_WINDOW_MS = 30_000;
+/**
+ * Only the simulated *world* (mock prices, mock flight feed) is labeled Simulated. Layover's own responses
+ * (decisions, Kite payments, on-chain refunds, claims) are real and are never labeled Simulated.
+ */
+export const SIMULATABLE_TYPES = new Set<TimelineEventType>([
+  "price_checked",
+  "price_drop",
+  "flight_status",
+  "disruption",
+]);
 
 /** Append-only trip timeline. Event ids are the SQLite sequence, so they double as SSE ids. */
 export class TimelineStore {
@@ -50,7 +60,8 @@ export class TimelineStore {
 
   append(input: AppendInput): TimelineEvent {
     const atUtc = this.clock.now().toISOString();
-    const simulated = input.simulated ?? this.isSimulated(input.tripId);
+    const simulated =
+      input.simulated ?? (SIMULATABLE_TYPES.has(input.type) && this.isSimulated(input.tripId));
     // Validate before writing so a bad event never lands in the store.
     TimelineEvent.parse({ ...input, id: "0", atUtc, simulated });
     const row = this.db
