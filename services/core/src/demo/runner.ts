@@ -81,6 +81,13 @@ async function main() {
   if (act === "act1") {
     await call("POST", "/demo/reset");
     await ensureProtected();
+    if (h.payer !== "fake") {
+      // Live: pay the original booking through Kite too, so the refund comes from money the merchant received.
+      const o = await call<{ confirmation: string; tx?: string }>("POST", "/demo/book-original", {
+        tripId: TRIP,
+      });
+      console.log(`Original booking paid via Kite: ${o.confirmation}${o.tx ? ` · tx ${o.tx}` : ""}`);
+    }
     const since = Math.max(0, ...(await timeline()).map((e) => Number(e.id)));
     await call("POST", "/demo/price", { hotelId: "lumen-goa", roomClass: "standard", newPrice: 58 });
     print(await waitFor(["refund_verified"], 5 * 60_000, since));

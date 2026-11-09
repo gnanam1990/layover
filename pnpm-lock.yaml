@@ -26,6 +26,9 @@ importers:
       typescript-eslint:
         specifier: ^8.72.1
         version: 8.72.1(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.3)
+      viem:
+        specifier: ^2.57.17
+        version: 2.57.17(typescript@5.9.3)(zod@4.6.7)
 
   apps/web:
     dependencies:
