@@ -157,6 +157,8 @@ export function createMerchantApp(over: Partial<MerchantDeps> = {}) {
       deps.state.updateBooking(b.confirmation, { refundTx });
       return c.json({ confirmation: b.confirmation, refundTx, refundTo, amountAtomic: atomic.toString() });
     } catch (e) {
+      // Never leave a booking cancelled without a refund on its way: roll the cancellation back.
+      deps.state.updateBooking(b.confirmation, { status: "active", refundTo: b.refundTo });
       return c.json(
         { confirmation: b.confirmation, error: "refund_failed", detail: (e as Error).message },
         502,

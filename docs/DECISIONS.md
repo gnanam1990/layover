@@ -87,3 +87,11 @@ Checked against EUR-Lex (Reg. 261/2004, CELEX:32004R0261; CJEU Sturgeon C-402/07
 | DGCA alternate/refund for delays | 6 h | > 6 h, **domestic only** |
 | DGCA hotel | 24 h or overnight | > 24 h, or > 6 h for departures between 20:00 and 03:00 |
 Not modelled (out of demo scope): DGCA denied boarding (para 3.2) and downgrades (3.5.1).
+
+## D9 — 2026-11-09 · Core API, demo clock, offline mode
+- `services.ts` wires every core service from config; `createApp` exposes TDD §7 routes plus DEMO_MODE-only `/demo/*` (seed, price, flight, reset, tick, time, approve, state). Every non-GET route needs `x-layover-token`; the web app's server-side proxy adds it, so the browser never holds it.
+- Trip intake: SERV extracts identifiers only (flight number + date, hotel confirmation); schedules, prices and refundability are looked up at the source (flight feed, merchant). Missing facts come back as one list of questions.
+- **Demo clock** (`DEMO_NOW`, `OffsetClock`): the trip is in December, so the recording runs with the clock shifted to the trip day (time still flows). `/health` reports `demoClock: true`.
+- **Offline mode** for tests/dev: `PAYER=fake` (FakePassport) + `FACILITATOR_URL=sim` on the merchant + no `SERV_API_KEY` → a deterministic SERV stub. `/health` reports `serv: "offline-stub"` and `payer: "fake"`; never used for the recorded demo.
+- Ticks (background loops and demo buttons) run on one serialized chain, so a demo button and a poll never interleave.
+- Fixes found by running real processes: the merchant now rolls a cancellation back if its refund can't be sent; Dropwatch no longer re-announces a drop it already acted on.
