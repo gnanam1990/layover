@@ -170,3 +170,37 @@ describe("deterministic desk advice", () => {
     expect(deterministicExplanation(a).bullets[0]).toContain("hotel tonight");
   });
 });
+
+describe("desk phrases in the local language", () => {
+  test("Frankfurt → German phrases from SERV are attached to the rights event", async () => {
+    const { w, detector, cancel, calls } = await setup({
+      DeskPhrases: (opts) => {
+        const n = (opts.user.match(/^\d\./gm) ?? []).length;
+        return {
+          language: "German",
+          phrases: Array.from({ length: n }, (_, i) => ({ local: `Bitte ${i}`, english: `Please ${i}` })),
+        };
+      },
+    });
+    await cancel();
+    await detector.tick(w.trip.id);
+    const ra = w.timeline.list(w.trip.id).find((e) => e.type === "rights_assessed")!;
+    const desk = (ra.data as { desk?: { language: string; phrases: unknown[] } }).desk;
+    expect(desk?.language).toBe("German");
+    expect(desk?.phrases.length).toBeGreaterThan(0);
+    expect(calls.find((c) => c.step === "DeskPhrases")!.user).toContain("Target language: German");
+  });
+
+  test("a phrase with an invented amount is rejected; the rights event still appears without phrases", async () => {
+    const { w, detector, cancel } = await setup({
+      DeskPhrases: () => ({
+        language: "German",
+        phrases: [{ local: "Ich bekomme 900 Euro", english: "I get 900 euros" }],
+      }),
+    });
+    await cancel();
+    await detector.tick(w.trip.id);
+    const ra = w.timeline.list(w.trip.id).find((e) => e.type === "rights_assessed")!;
+    expect((ra.data as { desk?: unknown }).desk).toBeUndefined();
+  });
+});

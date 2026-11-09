@@ -3,7 +3,7 @@ import { use, useEffect, useState } from "react";
 import Link from "next/link";
 import { formatMoney, type ClaimPack } from "@layover/shared";
 import { api } from "../../../../lib/api";
-import { shortHash } from "../../../../lib/format";
+import { claimValueText, shortHash } from "../../../../lib/format";
 import { TopBar } from "../../../../components/TopBar";
 import { Caption, Card, ExtLink, Skeleton, StatusChip } from "../../../../components/ui";
 
@@ -88,6 +88,11 @@ export default function ClaimPage({ params }: { params: Promise<{ id: string }> 
             <StatusChip kind="watching">Standard letter</StatusChip>
           )}
         </div>
+        {claimValueText(pack) && (
+          <p className="mono text-brown-700">
+            {claimValueText(pack)} · Layover&apos;s success fee: 15% of compensation, only if paid (Phase 2)
+          </p>
+        )}
         <Card aria-label="Entitlements">
           <Caption>What you&apos;re asking for</Caption>
           <ul className="mt-2 divide-y divide-line">

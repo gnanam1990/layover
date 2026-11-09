@@ -223,6 +223,23 @@ export const Explanation = z.strictObject({
   disclaimer: z.string(),
 });
 export const OptionWhy = z.strictObject({ why: z.array(z.string()) });
+export const DeskPhrases = z.strictObject({
+  language: z.string(),
+  phrases: z.array(z.strictObject({ local: z.string(), english: z.string() })).max(4),
+});
+
+/** Language spoken at the airport desk, by airport country (null = English is fine). */
+export const DESK_LANGUAGE: Record<string, string | null> = {
+  DE: "German",
+  FR: "French",
+  NL: "Dutch",
+  ES: "Spanish",
+  IN: "Hindi",
+  AE: "Arabic",
+  GB: null,
+  US: null,
+  SG: null,
+};
 
 // ---- Rule packs ----
 export const RulePackEntry = z.object({ key: z.string(), confidence: Confidence, source: z.string() });
@@ -281,5 +298,6 @@ export type TripDraft = z.infer<typeof TripDraft>;
 export type NoticeFacts = z.infer<typeof NoticeFacts>;
 export type Explanation = z.infer<typeof Explanation>;
 export type OptionWhy = z.infer<typeof OptionWhy>;
+export type DeskPhrases = z.infer<typeof DeskPhrases>;
 export type RulePack = z.infer<typeof RulePack>;
 export type Airport = z.infer<typeof Airport>;

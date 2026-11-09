@@ -10,9 +10,9 @@ import {
 } from "@layover/shared";
 import { api, ApiError, type TripDetail } from "../../../lib/api";
 import { useTimeline } from "../../../lib/sse";
-import { limitsSentence, money } from "../../../lib/format";
+import { claimValueText, limitsSentence, money } from "../../../lib/format";
 import { TopBar, useHealth } from "../../../components/TopBar";
-import { DecisionCard, SavingsBanner, SpendMeter, TripCard } from "../../../components/trip";
+import { AgentCard, DecisionCard, SavingsBanner, SpendMeter, TripCard } from "../../../components/trip";
 import { DoNotBanner, RightsPanel } from "../../../components/rights";
 import { Timeline } from "../../../components/timeline";
 import { PassportHandoff } from "../../../components/passport";
@@ -356,6 +356,7 @@ function Dashboard({
         </div>
         <div className="grid content-start gap-6 lg:col-span-4">
           <SpendMeter session={detail.session} spent={detail.spent} />
+          <AgentCard session={detail.session} />
           <Timeline events={events} connected={connected} max={40} />
           <Link
             href={`/trips/${detail.trip.id}/timeline`}
@@ -399,6 +400,7 @@ function RescueBand({
     (p) => p.pack === "eu261" && p.entitlements.some((e) => e.kind === "care_hotel"),
   );
   const desk = detail.rights?.explanation.bullets.slice(0, 3) ?? [];
+  const local = detail.rights?.desk;
 
   return (
     <section aria-label="Rescue mode" className="mb-6 grid gap-4">
@@ -408,12 +410,7 @@ function RescueBand({
         </p>
       </div>
       {/* Fixed order (UI spec S4): 1 DoNot → 2 Tonight → 3 Rights → 4 Desk → 5 Claim */}
-      {vw && (
-        <DoNotBanner
-          text="Don't accept a voucher if you want your cash refund. Ask for the refund in writing."
-          detail={vw.detail}
-        />
-      )}
+      {vw && <DoNotBanner text={vw.title} detail={vw.detail} />}
       <Card aria-label="Tonight">
         <Caption>Tonight</Caption>
         {booked ? (
@@ -465,12 +462,28 @@ function RescueBand({
               <li key={b}>{b}</li>
             ))}
           </ul>
+          {local && local.phrases.length > 0 && (
+            <div className="mt-4 rounded-input bg-paper-2 p-3">
+              <p className="t-caption text-muted">Show the desk ({local.language})</p>
+              <ul className="mt-2 space-y-2">
+                {local.phrases.map((ph) => (
+                  <li key={ph.local}>
+                    <p className="text-[18px] leading-7 text-ink">{ph.local}</p>
+                    <p className="t-small text-muted">{ph.english}</p>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </Card>
       )}
       {claim && (
         <Card>
           <p className="flex flex-wrap items-center gap-3">
             <span className="font-medium text-ink">{claim.title}</span>
+            {detail.claim && claimValueText(detail.claim.pack) && (
+              <span className="mono t-small text-brown-700">{claimValueText(detail.claim.pack)}</span>
+            )}
             <Link className="btn btn-primary" href={`/trips/${detail.trip.id}/claim`}>
               Open claim →
             </Link>
