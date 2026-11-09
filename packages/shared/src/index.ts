@@ -3,3 +3,4 @@ export * from "./money";
 export * from "./schemas";
 export * from "./rules";
 export * from "./geo";
+export * from "./regions";

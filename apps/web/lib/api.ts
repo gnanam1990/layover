@@ -52,6 +52,7 @@ export interface Health {
   network: "testnet" | "mainnet";
   priceScale: number;
   demoMode: boolean;
+  realData?: boolean;
 }
 
 export interface TripDetail {

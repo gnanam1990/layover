@@ -18,6 +18,9 @@ import { PassportError } from "../passport/errors";
 import { optionRank } from "../serv/prompts/optionRank";
 import { gate } from "../policy/gate";
 import { rankOptions } from "./options";
+import type { RealHotels } from "../realdata/hotels";
+import { purchaseLink } from "../realdata/buyer";
+import { AIRPORTS, haversineKm, round1 } from "@layover/shared";
 
 export interface RescueDeps {
   clock: Clock;
@@ -31,6 +34,8 @@ export interface RescueDeps {
   refundTo: () => Promise<string>;
   /** M09: builds the claim pack once the rescue is done (or not needed). */
   buildClaim: (info: DisruptionInfo) => Promise<void>;
+  /** Real-data mode: live hotel options near airports the bookable merchant doesn't cover. */
+  realHotels?: RealHotels;
 }
 
 interface Pending {
@@ -65,6 +70,11 @@ export class RescueOrchestrator {
       .hotelsNear(info.origin, info.nightDate, nextDay(info.nightDate))
       .catch(() => [] as Offer[]);
     const options = rankOptions(all);
+    if (options.length === 0 && this.d.realHotels) {
+      await this.realOptions(info);
+      await this.d.buildClaim(info);
+      return;
+    }
     const why = await optionRank(
       this.d.serv,
       options,
@@ -244,5 +254,55 @@ export class RescueOrchestrator {
     });
     await this.d.buildClaim(info);
     return true;
+  }
+
+  /** Real hotels near the airport with live rates (bought via Kite). Layover can't pay these; it shows them. */
+  private async realOptions(info: DisruptionInfo) {
+    const ap = AIRPORTS[info.origin];
+    try {
+      const { hotels, purchase } = await this.d.realHotels!.search(
+        `hotels near ${ap?.name ?? info.origin} airport`,
+        info.nightDate,
+        nextDay(info.nightDate),
+      );
+      const ranked = hotels
+        .filter((h) => h.totalUsd !== null)
+        .map((h) => ({
+          ...h,
+          km:
+            ap && h.lat !== null && h.lon !== null
+              ? round1(haversineKm(ap, { lat: h.lat, lon: h.lon! }))
+              : null,
+        }))
+        .filter((h) => h.km === null || h.km <= 15)
+        .sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0) || (a.totalUsd ?? 0) - (b.totalUsd ?? 0))
+        .slice(0, 3);
+      this.d.timeline.append({
+        tripId: info.tripId,
+        type: "rescue_options",
+        title: ranked.length
+          ? `Live hotel options near ${info.origin} tonight`
+          : `No live hotel rates found near ${info.origin}`,
+        detail:
+          "Real rates bought via Kite Passport. These hotels don't take agent payments yet: book one yourself and keep the receipt for your claim.",
+        data: {
+          options: ranked.map((h) => ({
+            name: h.name,
+            totalUsd: h.totalUsd,
+            rating: h.rating,
+            km: h.km,
+            link: h.link,
+          })),
+        },
+        links: purchaseLink(purchase),
+      });
+    } catch (e) {
+      this.d.timeline.append({
+        tripId: info.tripId,
+        type: "error",
+        title: "Couldn't get live hotel options",
+        detail: (e as Error).message,
+      });
+    }
   }
 }

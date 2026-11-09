@@ -60,8 +60,19 @@ function tripIntake(text: string) {
       ? text.slice(text.indexOf(confirmation))
       : "";
   const hd = dates(hotelPart);
+  const paid = /paid\s*(?:USD\s*)?\$?\s*(\d+(?:\.\d{1,2})?)/i.exec(text)?.[1];
   const hotels =
-    name || confirmation ? [{ name, checkIn: hd[0] ?? null, checkOut: hd[1] ?? null, confirmation }] : [];
+    name || confirmation
+      ? [
+          {
+            name,
+            checkIn: hd[0] ?? null,
+            checkOut: hd[1] ?? null,
+            confirmation,
+            pricePaid: paid ? Number(paid) : null,
+          },
+        ]
+      : [];
   const traveler = /\b(?:I am|I'm|name is|for)\s+([A-Z][a-z]+)\b/.exec(text)?.[1] ?? null;
   const missing: string[] = [];
   if (!traveler) missing.push("What's the traveler's name?");

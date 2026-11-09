@@ -15,6 +15,8 @@ import type { SessionManager } from "../passport/session-manager";
 import type { MerchantClient } from "../merchant/client";
 import { gate } from "../policy/gate";
 import { Rebooker, type RebookOutcome } from "./rebook";
+import { REAL_HOTEL_MERCHANT, type RealHotels } from "../realdata/hotels";
+import { purchaseLink } from "../realdata/buyer";
 
 export interface WatcherDeps {
   clock: Clock;
@@ -25,6 +27,8 @@ export interface WatcherDeps {
   rebooker: Rebooker;
   allowedOrigins: string[];
   priceCheckedThrottleMs?: number;
+  /** Real-data mode: live rates for hotels booked outside Layover (watch-only). */
+  realHotels?: RealHotels;
 }
 
 export interface TickResult {
@@ -58,10 +62,63 @@ export class DropWatcher {
     if (!trip) return [];
     const now = this.d.clock.now();
     const out: TickResult[] = [];
-    for (const b of trip.hotelBookings.filter((x) => this.watchable(x, now))) {
-      out.push(await this.checkBooking(tripId, b, false));
+    for (const b of trip.hotelBookings) {
+      if (b.merchantId === REAL_HOTEL_MERCHANT) {
+        if (b.status === "active" && Date.parse(`${b.checkIn}T00:00:00Z`) > now.getTime())
+          out.push(await this.watchReal(tripId, b));
+        continue;
+      }
+      if (this.watchable(b, now)) out.push(await this.checkBooking(tripId, b, false));
     }
     return out;
+  }
+
+  private realAnnounced = new Map<string, number>();
+
+  /**
+   * Real hotel (booked outside Layover): check the live rate (a real Kite payment for the data) and alert on a
+   * real drop. Watch-only: these hotels don't accept agent payments, so Layover never books or cancels them.
+   */
+  private async watchReal(tripId: string, b: HotelBooking): Promise<TickResult> {
+    const real = this.d.realHotels;
+    if (!real) return { bookingId: b.id, action: "none" };
+    let r;
+    try {
+      r = await real.rate(b.hotelId, b.checkIn, b.checkOut);
+    } catch (e) {
+      this.d.timeline.append({
+        tripId,
+        type: "error",
+        title: `Couldn't get the live rate for ${b.hotelName}`,
+        detail: (e as Error).message,
+      });
+      return { bookingId: b.id, action: "none" };
+    }
+    if (!r.fresh) return { bookingId: b.id, action: "none" };
+    const total = r.hotel.totalUsd;
+    const paid = Number(b.price.amountMinor) / 100;
+    const links = purchaseLink(r.purchase);
+    this.d.timeline.append({
+      tripId,
+      type: "price_checked",
+      title: `Live rate at ${b.hotelName}: ${total === null ? "not available" : `$${total.toFixed(2)}`} for your dates`,
+      detail: `You paid $${paid.toFixed(2)}. Real rate bought via Kite Passport.`,
+      data: { source: "x402atlas", total, paid },
+      links,
+    });
+    const minSaving = Number(this.d.trips.get(tripId)!.settings.minSaving.amountMinor) / 100;
+    if (total === null || paid - total < minSaving) return { bookingId: b.id, action: "none" };
+    if (this.realAnnounced.get(b.id) === total) return { bookingId: b.id, action: "none" };
+    this.realAnnounced.set(b.id, total);
+    this.d.timeline.append({
+      tripId,
+      type: "price_drop",
+      title: `${b.hotelName} is now $${total.toFixed(2)} for your dates (you paid $${paid.toFixed(2)})`,
+      detail: `Real live rate: you could save $${(paid - total).toFixed(2)}. This hotel doesn't take agent payments, so rebook it yourself, then cancel your old booking.`,
+      data: { source: "x402atlas", total, paid, watchOnly: true },
+      links: [...(r.hotel.link ? [{ label: "Hotel site", url: r.hotel.link }] : []), ...links],
+    });
+    return { bookingId: b.id, action: "none" };
   }
 
   async confirm(tripId: string, bookingId: string): Promise<TickResult> {

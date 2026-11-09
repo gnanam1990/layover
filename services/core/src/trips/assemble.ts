@@ -1,5 +1,6 @@
 import type { Flight, HotelBooking, Trip, TripDraft, TripSettings } from "@layover/shared";
 import type { MerchantClient } from "../merchant/client";
+import { REAL_HOTEL_MERCHANT, type RealHotels } from "../realdata/hotels";
 
 export const DEFAULT_SETTINGS: TripSettings = {
   autoRebook: true,
@@ -21,6 +22,7 @@ export async function assembleTrip(
   draft: TripDraft,
   merchant: MerchantClient,
   id: string,
+  realHotels?: RealHotels,
 ): Promise<AssembleResult> {
   const missing = [...draft.missing];
   if (!draft.travelerName && !missing.some((m) => /name/i.test(m)))
@@ -52,11 +54,41 @@ export async function assembleTrip(
   }
   const hotelBookings: HotelBooking[] = [];
   for (const h of draft.hotels) {
-    if (!h.confirmation) {
+    // Real-data mode: a hotel booked elsewhere needs no Layover confirmation number.
+    if (!h.confirmation && !realHotels) {
       missing.push(`What's the confirmation number for ${h.name ?? "your hotel"}?`);
       continue;
     }
-    const b = await merchant.booking(h.confirmation);
+    const b = h.confirmation ? await merchant.booking(h.confirmation) : null;
+    if (!b && realHotels && h.name && h.checkIn && h.checkOut) {
+      // A real hotel booked elsewhere: find it at the live-rates provider and watch it (watch-only).
+      if (h.pricePaid === null) {
+        missing.push(`How much did you pay in total for ${h.name}?`);
+        continue;
+      }
+      const { hotels } = await realHotels.search(h.name, h.checkIn, h.checkOut);
+      const match = hotels[0];
+      if (!match) {
+        missing.push(`I couldn't find ${h.name} with live rates. Check the hotel name?`);
+        continue;
+      }
+      hotelBookings.push({
+        id: `hb_${hotelBookings.length + 1}`,
+        merchantId: REAL_HOTEL_MERCHANT,
+        hotelId: match.token,
+        hotelName: match.name,
+        ...(match.rating !== null && { rating: match.rating }),
+        checkIn: h.checkIn,
+        checkOut: h.checkOut,
+        price: { amountMinor: String(Math.round(h.pricePaid * 100)), currency: "USD" },
+        refundable: match.freeCancellation ?? false,
+        ...(h.confirmation && { confirmation: h.confirmation }),
+        paymentTx: null,
+        payer: null,
+        status: "active",
+      });
+      continue;
+    }
     if (!b) {
       missing.push(`I couldn't find hotel booking ${h.confirmation}. Check the confirmation number?`);
       continue;

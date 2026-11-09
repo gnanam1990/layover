@@ -51,6 +51,11 @@ export function TopBar({ protectedTrip = false }: { protectedTrip?: boolean }) {
           {h?.serv === "offline-stub" && <StatusChip kind="action">SERV offline stub</StatusChip>}
           {h?.payer === "fake" && <StatusChip kind="action">Fake payer</StatusChip>}
           {h?.payer === "direct" && <StatusChip kind="watching">Direct x402 (testnet)</StatusChip>}
+          {h?.realData && (
+            <StatusChip kind="protected" dot>
+              Live data via Kite
+            </StatusChip>
+          )}
           {h?.demoClock && <StatusChip kind="simulated">Demo clock</StatusChip>}
           {h?.demoMode && (
             <Link

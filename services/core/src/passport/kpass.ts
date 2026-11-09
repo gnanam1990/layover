@@ -220,6 +220,7 @@ export class KpassPassport implements PassportAdapter {
       ...(p.body === undefined && p.headers ? ["--headers", JSON.stringify(p.headers)] : []),
       ...(p.body !== undefined ? ["--body", JSON.stringify(p.body)] : []),
       ...(p.sessionId ? ["--session-id", p.sessionId] : []),
+      ...(p.useAllowance && !p.sessionId ? ["--use-allowance"] : []),
     ];
     const j = await this.call("sessionExecute", flags, 300_000);
     const status = Number(get(j, "x402.status_code") ?? 0);
