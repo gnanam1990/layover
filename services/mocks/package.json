@@ -22,6 +22,7 @@
   "exports": {
     ".": "./src/merchant.ts",
     "./sim-facilitator": "./src/sim-facilitator.ts",
-    "./config": "./src/config.ts"
+    "./config": "./src/config.ts",
+    "./state": "./src/state.ts"
   }
 }
