@@ -1,0 +1,91 @@
+{
+  "id": "eu261",
+  "version": "2026-11-09",
+  "name": "EU Regulation (EC) 261/2004",
+  "officialUrl": "https://eur-lex.europa.eu/eli/reg/2004/261/oj",
+  "applies": {
+    "departRegions": ["EU", "EEA"],
+    "arriveRegions": ["EU", "EEA"],
+    "arriveRequiresCarrierCountries": [
+      "AT",
+      "BE",
+      "BG",
+      "HR",
+      "CY",
+      "CZ",
+      "DK",
+      "EE",
+      "FI",
+      "FR",
+      "DE",
+      "GR",
+      "HU",
+      "IE",
+      "IT",
+      "LV",
+      "LT",
+      "LU",
+      "MT",
+      "NL",
+      "PL",
+      "PT",
+      "RO",
+      "SK",
+      "SI",
+      "ES",
+      "SE",
+      "IS",
+      "LI",
+      "NO",
+      "CH"
+    ]
+  },
+  "bands": [
+    { "maxKm": 1500, "amount": 250, "currency": "EUR", "careAfterMin": 120 },
+    { "maxKm": 3500, "amount": 400, "currency": "EUR", "careAfterMin": 180 },
+    { "maxKm": null, "amount": 600, "currency": "EUR", "careAfterMin": 240 }
+  ],
+  "intraEuOver1500UsesBand": 1,
+  "cancellation": {
+    "noCompensationIfNoticeDays": 14,
+    "refundOrReroute": true
+  },
+  "delay": {
+    "compensationArrivalDelayMin": 180,
+    "refundOrRerouteDepDelayMin": 300
+  },
+  "care": {
+    "meals": true,
+    "hotelIfOvernight": true,
+    "transport": true,
+    "selfBuyReimbursable": true
+  },
+  "extraordinaryReasons": ["weather", "atc", "security"],
+  "voucherWarning": {
+    "doNot": "Do not accept a voucher instead of cash unless you want it: a cash refund is the default.",
+    "action": "Ask the desk for a hotel first; if refused, we book it and you claim it back."
+  },
+  "evidenceNeeded": [
+    "Boarding pass or booking confirmation",
+    "Airline cancellation/delay notice",
+    "Receipts for meals, hotel and transport"
+  ],
+  "entries": [
+    { "key": "applies", "confidence": "HIGH", "source": "Reg. 261/2004 Art. 3(1)" },
+    { "key": "compensation.bands", "confidence": "HIGH", "source": "Reg. 261/2004 Art. 7(1)" },
+    { "key": "care.thresholds", "confidence": "MEDIUM", "source": "Reg. 261/2004 Art. 6(1)" },
+    { "key": "cancellation.notice14", "confidence": "HIGH", "source": "Reg. 261/2004 Art. 5(1)(c)(i)" },
+    {
+      "key": "cancellation.shortNoticeRerouteExemption",
+      "confidence": "VERIFY",
+      "source": "Reg. 261/2004 Art. 5(1)(c)(ii)-(iii)"
+    },
+    { "key": "delay.arrival3h", "confidence": "HIGH", "source": "CJEU Sturgeon C-402/07 and C-432/07" },
+    { "key": "delay.longhaul50pct", "confidence": "VERIFY", "source": "Reg. 261/2004 Art. 7(2)(c)" },
+    { "key": "extraordinary", "confidence": "HIGH", "source": "Reg. 261/2004 Art. 5(3), recital 14" },
+    { "key": "care.hotel", "confidence": "HIGH", "source": "Reg. 261/2004 Art. 9(1)(b)-(c)" },
+    { "key": "care.meals", "confidence": "HIGH", "source": "Reg. 261/2004 Art. 9(1)(a)" },
+    { "key": "refundOrReroute", "confidence": "HIGH", "source": "Reg. 261/2004 Art. 8" },
+    { "key": "voucher", "confidence": "HIGH", "source": "Reg. 261/2004 Art. 7(3)" }
+  ]
+}

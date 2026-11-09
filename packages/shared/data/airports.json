@@ -1,0 +1,130 @@
+{
+  "FRA": {
+    "name": "Frankfurt",
+    "lat": 50.0379,
+    "lon": 8.5622,
+    "country": "DE",
+    "region": "EU",
+    "tz": "Europe/Berlin"
+  },
+  "MUC": {
+    "name": "Munich",
+    "lat": 48.3538,
+    "lon": 11.7861,
+    "country": "DE",
+    "region": "EU",
+    "tz": "Europe/Berlin"
+  },
+  "CDG": {
+    "name": "Paris Charles de Gaulle",
+    "lat": 49.0097,
+    "lon": 2.5479,
+    "country": "FR",
+    "region": "EU",
+    "tz": "Europe/Paris"
+  },
+  "AMS": {
+    "name": "Amsterdam Schiphol",
+    "lat": 52.3105,
+    "lon": 4.7683,
+    "country": "NL",
+    "region": "EU",
+    "tz": "Europe/Amsterdam"
+  },
+  "MAD": {
+    "name": "Madrid Barajas",
+    "lat": 40.4983,
+    "lon": -3.5676,
+    "country": "ES",
+    "region": "EU",
+    "tz": "Europe/Madrid"
+  },
+  "LHR": {
+    "name": "London Heathrow",
+    "lat": 51.47,
+    "lon": -0.4543,
+    "country": "GB",
+    "region": "UK",
+    "tz": "Europe/London"
+  },
+  "BLR": {
+    "name": "Bengaluru",
+    "lat": 13.1986,
+    "lon": 77.7066,
+    "country": "IN",
+    "region": "IN",
+    "tz": "Asia/Kolkata"
+  },
+  "DEL": {
+    "name": "Delhi",
+    "lat": 28.5562,
+    "lon": 77.1,
+    "country": "IN",
+    "region": "IN",
+    "tz": "Asia/Kolkata"
+  },
+  "BOM": {
+    "name": "Mumbai",
+    "lat": 19.0896,
+    "lon": 72.8656,
+    "country": "IN",
+    "region": "IN",
+    "tz": "Asia/Kolkata"
+  },
+  "GOI": {
+    "name": "Goa Dabolim",
+    "lat": 15.3808,
+    "lon": 73.8314,
+    "country": "IN",
+    "region": "IN",
+    "tz": "Asia/Kolkata"
+  },
+  "MAA": {
+    "name": "Chennai",
+    "lat": 12.9941,
+    "lon": 80.1709,
+    "country": "IN",
+    "region": "IN",
+    "tz": "Asia/Kolkata"
+  },
+  "JFK": {
+    "name": "New York JFK",
+    "lat": 40.6413,
+    "lon": -73.7781,
+    "country": "US",
+    "region": "US",
+    "tz": "America/New_York"
+  },
+  "SFO": {
+    "name": "San Francisco",
+    "lat": 37.6213,
+    "lon": -122.379,
+    "country": "US",
+    "region": "US",
+    "tz": "America/Los_Angeles"
+  },
+  "ORD": {
+    "name": "Chicago O'Hare",
+    "lat": 41.9742,
+    "lon": -87.9073,
+    "country": "US",
+    "region": "US",
+    "tz": "America/Chicago"
+  },
+  "DXB": {
+    "name": "Dubai",
+    "lat": 25.2532,
+    "lon": 55.3657,
+    "country": "AE",
+    "region": "OTHER",
+    "tz": "Asia/Dubai"
+  },
+  "SIN": {
+    "name": "Singapore Changi",
+    "lat": 1.3644,
+    "lon": 103.9915,
+    "country": "SG",
+    "region": "OTHER",
+    "tz": "Asia/Singapore"
+  }
+}
