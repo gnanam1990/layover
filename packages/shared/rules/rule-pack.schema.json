@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "rule-pack.schema.json",
+  "title": "rule-pack.schema",
+  "type": "object",
+  "required": ["id", "version", "officialUrl", "applies", "entries"],
+  "properties": {
+    "id": {
+      "enum": ["eu261", "uk261", "us_dot", "in_dgca"]
+    },
+    "version": {
+      "type": "string"
+    },
+    "officialUrl": {
+      "type": "string"
+    },
+    "applies": {
+      "type": "object"
+    },
+    "bands": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "maxKm": {
+            "type": ["number", "null"]
+          },
+          "amount": {
+            "type": "integer"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "careAfterMin": {
+            "type": "integer"
+          }
+        }
+      }
+    },
+    "cancellation": {
+      "type": "object"
+    },
+    "delay": {
+      "type": "object"
+    },
+    "care": {
+      "type": "object"
+    },
+    "voucherWarning": {
+      "type": "object"
+    },
+    "entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["key", "confidence", "source"],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "confidence": {
+            "enum": ["HIGH", "MEDIUM", "VERIFY"]
+          },
+          "source": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

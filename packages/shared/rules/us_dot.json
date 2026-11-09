@@ -1,0 +1,59 @@
+{
+  "id": "us_dot",
+  "version": "2026-11-09",
+  "name": "US DOT automatic refund rule (14 CFR 260)",
+  "officialUrl": "https://www.transportation.gov/airconsumer",
+  "applies": {
+    "anyEndpointRegions": ["US"]
+  },
+  "cancellation": {
+    "refundIfDeclined": true,
+    "anyCause": true
+  },
+  "delay": {
+    "significantDomesticMin": 180,
+    "significantInternationalMin": 360,
+    "measuredOn": "departure_or_arrival"
+  },
+  "care": {
+    "airlineCommitmentOnly": true,
+    "dashboardUrl": "https://www.transportation.gov/airconsumer/airline-customer-service-dashboard"
+  },
+  "noFederalCompensation": true,
+  "voucherWarning": {
+    "doNot": "Don't accept a voucher or credit if you want your cash refund.",
+    "action": "Decline the rebooking or voucher if you want cash: the refund goes back to your original form of payment."
+  },
+  "refundTiming": { "cardBusinessDays": 7, "otherCalendarDays": 20 },
+  "evidenceNeeded": [
+    "Booking confirmation and payment method",
+    "Airline cancellation or schedule-change notice",
+    "Proof you declined the alternative"
+  ],
+  "entries": [
+    { "key": "applies", "confidence": "HIGH", "source": "14 CFR 260.2" },
+    { "key": "refund.cancellation", "confidence": "HIGH", "source": "14 CFR 260.6" },
+    {
+      "key": "delay.significant",
+      "confidence": "MEDIUM",
+      "source": "14 CFR 260.2 (significant change definition)"
+    },
+    { "key": "delay.measuredOn", "confidence": "VERIFY", "source": "14 CFR 260.2" },
+    { "key": "refund.timing", "confidence": "MEDIUM", "source": "14 CFR 260.6(c)" },
+    {
+      "key": "compensation.none",
+      "confidence": "HIGH",
+      "source": "DOT withdrew the compensation NPRM in 2025"
+    },
+    {
+      "key": "care.airlineCommitment",
+      "confidence": "MEDIUM",
+      "source": "DOT Airline Customer Service Dashboard"
+    },
+    {
+      "key": "voucher",
+      "confidence": "HIGH",
+      "source": "14 CFR 260.6 (refund unless passenger accepts alternative)"
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "state": "cancelled",
+  "newDepUtc": null,
+  "offeredAlternatives": ["LH763 2026-12-21 08:40Z"],
+  "offeredVoucher": true,
+  "reasonClass": "technical",
+  "noticeAtUtc": "2026-12-20T19:55:00Z"
+}
