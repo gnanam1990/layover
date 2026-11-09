@@ -249,3 +249,19 @@ describe("flight feed and admin", () => {
     expect(((await (await app.request(q)).json()) as { rateTier: number }).rateTier).toBe(72);
   });
 });
+
+describe("refund failure", () => {
+  test("a failed refund rolls the cancellation back (booking stays active, retry possible)", async () => {
+    const { app } = setup({
+      refundSender: {
+        async send() {
+          throw new Error("rpc down");
+        },
+      },
+    });
+    const r = await app.request("/catalog/cancel", json({ confirmation: "HX-2231", refundTo: WALLET }));
+    expect(r.status).toBe(502);
+    const b = (await (await app.request("/catalog/bookings/HX-2231")).json()) as { status: string };
+    expect(b.status).toBe("active");
+  });
+});

@@ -94,7 +94,7 @@
   },
   "extraordinaryReasons": ["weather", "atc", "security"],
   "voucherWarning": {
-    "doNot": "Do not accept a voucher instead of cash unless you want it: a cash refund is the default.",
+    "doNot": "Don't accept a voucher if you want your cash refund. Ask for the refund in writing.",
     "action": "Ask the desk for a hotel first; if refused, we book it and you claim it back."
   },
   "evidenceNeeded": [

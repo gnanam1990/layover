@@ -12,6 +12,35 @@ export interface MerchantClient {
   >;
   flightStatus(flightId: string): Promise<FlightStatus>;
   flightNotice(flightId: string): Promise<string>;
+  flightInfo(flightId: string): Promise<MerchantFlight | null>;
+  booking(confirmation: string): Promise<MerchantBooking | null>;
+  /** Demo admin (DEMO_MODE only): core forwards the panel's buttons so the browser never sees ADMIN_TOKEN. */
+  admin(
+    path: "price" | "flight" | "reset",
+    body: unknown,
+    adminToken: string,
+  ): Promise<{ ok: boolean; status: number }>;
+}
+
+export interface MerchantFlight {
+  id: string;
+  carrier: string;
+  number: string;
+  from: string;
+  to: string;
+  schedDepUtc: string;
+  schedArrUtc: string;
+  airlineCountry: string;
+  status: FlightStatus;
+}
+export interface MerchantBooking {
+  confirmation: string;
+  hotelId: string;
+  roomClass: string;
+  checkIn: string;
+  checkOut: string;
+  priceUsd: number;
+  status: string;
 }
 
 /** Talks to the mock merchant's free routes (catalog, cancel, flight feed). Paid booking goes through Passport. */
@@ -54,6 +83,22 @@ export function createMerchantClient(
     async flightNotice(flightId) {
       const j = (await getJson(`/flights/${encodeURIComponent(flightId)}/notice`)) as { text?: string };
       return j.text ?? "";
+    },
+    async flightInfo(flightId) {
+      const res = await fetchFn(`${base}/flights/${encodeURIComponent(flightId)}/info`);
+      return res.ok ? ((await res.json()) as MerchantFlight) : null;
+    },
+    async booking(confirmation) {
+      const res = await fetchFn(`${base}/catalog/bookings/${encodeURIComponent(confirmation)}`);
+      return res.ok ? ((await res.json()) as MerchantBooking) : null;
+    },
+    async admin(path, body, adminToken) {
+      const res = await fetchFn(`${base}/admin/${path}`, {
+        method: "POST",
+        headers: { "content-type": "application/json", authorization: `Bearer ${adminToken}` },
+        body: JSON.stringify(body ?? {}),
+      });
+      return { ok: res.ok, status: res.status };
     },
   };
 }
