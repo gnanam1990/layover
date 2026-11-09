@@ -1,0 +1,21 @@
+{
+  "name": "@layover/mocks",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "bun --env-file=../../.env --watch src/main.ts",
+    "start": "bun src/main.ts",
+    "test": "bun test",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@layover/shared": "workspace:*",
+    "@x402/core": "^2.30.0",
+    "@x402/evm": "^2.30.0",
+    "@x402/hono": "^2.30.0",
+    "hono": "^4.13.17",
+    "viem": "^2.57.17",
+    "zod": "^4.6.7"
+  }
+}
