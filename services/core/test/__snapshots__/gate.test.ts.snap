@@ -1,0 +1,146 @@
+// Bun Snapshot v1, https://bun.sh/docs/test/snapshots
+
+exports[`properties every decision lists all checks, including passing ones, and is deterministic 1`] = `
+{
+  "action": "rebook",
+  "allow": true,
+  "checks": [
+    {
+      "detail": "active, valid until 2026-12-19T10:00:00Z",
+      "name": "session_active",
+      "pass": true,
+    },
+    {
+      "detail": "$58.00",
+      "name": "amount_positive",
+      "pass": true,
+    },
+    {
+      "detail": "USD vs session USD",
+      "name": "currency",
+      "pass": true,
+    },
+    {
+      "detail": "https://merchant.test is allowed",
+      "name": "merchant_origin",
+      "pass": true,
+    },
+    {
+      "detail": "$58.00 ≤ $120.00",
+      "name": "max_per_tx",
+      "pass": true,
+    },
+    {
+      "detail": "$58.00 + $0.00 spent ≤ $270.00",
+      "name": "max_total",
+      "pass": true,
+    },
+    {
+      "detail": "auto-rebook is on",
+      "name": "consent",
+      "pass": true,
+    },
+    {
+      "detail": "2026-12-20→2026-12-22 vs booked 2026-12-20→2026-12-22",
+      "name": "same_dates",
+      "pass": true,
+    },
+    {
+      "detail": "standard ≥ standard",
+      "name": "room_class",
+      "pass": true,
+    },
+    {
+      "detail": "same hotel",
+      "name": "hotel_quality",
+      "pass": true,
+    },
+    {
+      "detail": "free cancellation",
+      "name": "refundable",
+      "pass": true,
+    },
+    {
+      "detail": "old booking cancellable until 2026-12-19T12:00:00Z (2 h margin)",
+      "name": "cancel_window",
+      "pass": true,
+    },
+    {
+      "detail": "$14.00 ≥ $5.00",
+      "name": "min_saving",
+      "pass": true,
+    },
+  ],
+  "reasons": [],
+}
+`;
+
+exports[`properties every decision lists all checks, including passing ones, and is deterministic 2`] = `
+{
+  "action": "rescue_hotel",
+  "allow": true,
+  "checks": [
+    {
+      "detail": "active, valid until 2026-12-25T00:00:00Z",
+      "name": "session_active",
+      "pass": true,
+    },
+    {
+      "detail": "$96.00",
+      "name": "amount_positive",
+      "pass": true,
+    },
+    {
+      "detail": "USD vs session USD",
+      "name": "currency",
+      "pass": true,
+    },
+    {
+      "detail": "https://merchant.test is allowed",
+      "name": "merchant_origin",
+      "pass": true,
+    },
+    {
+      "detail": "$96.00 ≤ $120.00",
+      "name": "max_per_tx",
+      "pass": true,
+    },
+    {
+      "detail": "$96.00 + $0.00 spent ≤ $270.00",
+      "name": "max_total",
+      "pass": true,
+    },
+    {
+      "detail": "auto-rescue is on",
+      "name": "consent",
+      "pass": true,
+    },
+    {
+      "detail": "overnight stay needed",
+      "name": "overnight",
+      "pass": true,
+    },
+    {
+      "detail": "6 km from the airport (max 10 km)",
+      "name": "distance",
+      "pass": true,
+    },
+    {
+      "detail": "4★ (min 3.5★)",
+      "name": "rating",
+      "pass": true,
+    },
+    {
+      "detail": "free cancellation",
+      "name": "refundable",
+      "pass": true,
+    },
+    {
+      "detail": "check-in 2026-12-20 vs disruption night 2026-12-20",
+      "name": "date",
+      "pass": true,
+    },
+  ],
+  "reasons": [],
+}
+`;
