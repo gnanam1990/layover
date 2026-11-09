@@ -1,5 +1,5 @@
 import type { CallOpts, ServClient, StepName } from "../src/serv/client";
-import { ServValidationError } from "../src/serv/client";
+import { ServError, ServValidationError } from "../src/serv/client";
 
 export type Handler = (opts: CallOpts<unknown>) => unknown | Promise<unknown>;
 
@@ -20,6 +20,7 @@ export function fakeServ(handlers: Partial<Record<StepName, Handler | Handler[]>
           opts.postCheck?.(v);
           return v;
         } catch (e) {
+          if (e instanceof ServError && !(e instanceof ServValidationError)) throw e; // transport errors don't retry
           last = e;
         }
       }

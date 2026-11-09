@@ -141,3 +141,32 @@ describe("DisruptionDetector", () => {
     expect(w.types()).not.toContain("flight_status");
   });
 });
+
+describe("deterministic desk advice", () => {
+  test("leads with the most urgent help (hotel, meals) before money", async () => {
+    const { deterministicExplanation } = await import("../src/disruption/notice");
+    const { assess } = await import("../src/rights/engine");
+    const a = assess({
+      flight: {
+        id: "LH761",
+        carrier: "LH",
+        number: "761",
+        from: "FRA",
+        to: "BLR",
+        schedDepUtc: "2026-12-20T20:50:00Z",
+        schedArrUtc: "2026-12-21T09:20:00Z",
+        airlineCountry: "DE",
+      },
+      status: {
+        state: "cancelled",
+        depDelayMin: 0,
+        arrDelayMin: 0,
+        noticeAtUtc: "2026-12-20T14:50:00Z",
+        reasonClass: "technical",
+      },
+      facts: FACTS,
+      now: new Date("2026-12-20T19:55:00Z"),
+    })!;
+    expect(deterministicExplanation(a).bullets[0]).toContain("hotel tonight");
+  });
+});

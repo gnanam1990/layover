@@ -101,3 +101,11 @@ Not modelled (out of demo scope): DGCA denied boarding (para 3.2) and downgrades
 - **Contrast fix:** the spec's warn colour `#B7791F` on `#FFF4E5` is 3.35:1 (fails WCAG AA, which the spec requires). Warning *text* uses `--warn-text: #8A5A12` (≈ 5.9:1); `--warn` stays for accents.
 - **"Simulated" label:** only events that describe the simulated world (price checks/drops from the mock merchant, mock flight status, the disruption) are labeled Simulated. Layover's responses (policy decisions, Kite payments, on-chain refunds, rescue booking, claim) are real and are never labeled Simulated, so the demo never undersells real transactions.
 - Offline stack (`pnpm dev:offline`): fake payer, SERV stub, simulated facilitator, simulated refunds and chain checks. The top bar shows "Fake payer" and "SERV offline stub" whenever it runs. Playwright + axe run against it in CI.
+
+## D11 — 2026-11-09 · Local verification pass (fixes)
+Found by running everything locally (PowerShell terminal + browser), not by the unit tests:
+- **kpass needs a registered agent:** `session create` fails with "Agent not registered" until `kpass agent:register --type <type>` runs. `KpassPassport` now registers itself (idempotent) before requesting a session; type from `KPASS_AGENT_TYPE` (default `layover`). To confirm on the first live run.
+- **kpass errors without `error_code`** (logged out: exit 3; unregistered) now map to `not_logged_in` / `agent_not_registered` with plain hints, instead of "unexpected error".
+- **Windows:** the offline launcher spawned `bun`/`pnpm` by name (fails outside Git Bash); it now uses the running Bun binary and `node …/next`. PowerShell may block `pnpm.ps1`; use `pnpm.cmd`.
+- **Offline mode leaked real config:** Bun auto-loads `.env`, so offline mode used the real merchant refund key. The launcher now drops every variable named in `.env.example` before starting.
+- Hotel-only trips no longer require a flight (offline intake stub); protect form inputs have proper labels and reject a $0 per-booking cap; copy-letter falls back when the clipboard API is blocked; the claim says why the standard letter was used; desk advice leads with hotel and meals; tap-to-rebook wording; top bar shape on phones.

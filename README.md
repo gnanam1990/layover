@@ -69,6 +69,8 @@ pnpm dev:offline              # open http://localhost:3000 → Load demo trip
 ```
 Scripted demo runs: `pnpm demo:act1`, `pnpm demo:act2`. Tests: `pnpm test`, `pnpm e2e`.
 
+On Windows PowerShell, if `pnpm` is blocked by the script execution policy, use `pnpm.cmd` (e.g. `pnpm.cmd dev:offline`).
+
 ## Layout
 `apps/web` (Next.js 15, Kite theme) · `services/core` (Hono on Bun: API, Dropwatch, rights engine, policy gate, rescue, claims, timeline, Passport adapter) · `services/mocks` (merchant with x402 paywall, flight feed, demo admin) · `packages/shared` (zod schemas, bigint money math, rule packs).
 

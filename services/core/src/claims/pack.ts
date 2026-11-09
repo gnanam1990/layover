@@ -187,11 +187,16 @@ export class ClaimBuilder {
     const data = this.data(info);
     let letter: ClaimLetter;
     let validated = true;
+    let fallbackReason = "";
     try {
       letter = await claimDraft(this.d.serv, data, (l) => checkLetter(l, data));
-    } catch {
+    } catch (e) {
       letter = templateLetter(data);
       validated = false;
+      fallbackReason =
+        e instanceof ServValidationError
+          ? "the AI draft didn't pass the checks"
+          : "SERV Reasoning wasn't available";
     }
     const pack: ClaimPack = {
       id: `claim_${crypto.randomUUID().slice(0, 8)}`,
@@ -215,7 +220,7 @@ export class ClaimBuilder {
       title: `Your claim to ${info.flight.carrier} is ready`,
       detail: validated
         ? `Drafted by SERV and checked: every amount and receipt comes from your records. ${data.receipts.length} receipt(s) attached.`
-        : "Using Layover's standard letter (the AI draft didn't pass the checks). Every amount comes from your records.",
+        : `Using Layover's standard letter (${fallbackReason}). Every amount comes from your records.`,
       data: { claimId: pack.id, validated },
       links: [{ label: "Open claim", url: `/trips/${info.tripId}/claim` }],
     });

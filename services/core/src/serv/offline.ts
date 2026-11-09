@@ -65,7 +65,7 @@ function tripIntake(text: string) {
   const traveler = /\b(?:I am|I'm|name is|for)\s+([A-Z][a-z]+)\b/.exec(text)?.[1] ?? null;
   const missing: string[] = [];
   if (!traveler) missing.push("What's the traveler's name?");
-  if (!flights.length) missing.push("Which flight are you taking (number, route, date)?");
+  if (!flights.length && !hotels.length) missing.push("Which flight are you taking (number, route, date)?");
   for (const h of hotels) if (!h.checkOut) missing.push("Which date do you check out?");
   return { travelerName: traveler, flights, hotels, missing };
 }
