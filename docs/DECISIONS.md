@@ -56,3 +56,10 @@ Deviations from `docs/build-pack/` and spike evidence, newest last.
 - `FakePassport` pays the mock merchant through its real 402 flow (simulated facilitator) and enforces per-tx/total/TTL in 6-decimal fixed point.
 - `DirectX402Payer` (F2) signs EIP-3009 `TransferWithAuthorization` per `accepts[0]` (domain `name`/`version` from `extra`, `verifyingContract` = token); verified with viem `verifyTypedData`.
 - S2 (endpoint constraints): flag exists (`execution_constraints.x402`), recorded only — see above.
+
+## D6 — 2026-11-09 · M06 Dropwatch
+- A "price drop" is announced for the booked hotel at a lower price, or for a nearby alternative that already looks like a like-for-like swap (refundable, rating ≥ booked, ≤ 2 km, room class ≥ booked). The policy gate still re-checks everything; this pre-filter only keeps cheaper-but-worse hotels (e.g. Palm Row, 3.9★) from spamming the timeline.
+- A denied drop is announced once per (hotel, price, reasons), not every tick.
+- Rebook idempotency key: `tripId:bookingId:hotelId-roomClass-tier`, claimed in the `rebooks` table before paying; an in-process lock per booking stops two concurrent ticks.
+- The fee is 30 % of the saving in integer cents (`pct(saving, 3000)`): saving $14.00 → fee $4.20, traveler keeps $9.80.
+- Refund check: poll the chain every 5 s; after 2 min emit "Refund pending" and keep polling up to 30 min.
