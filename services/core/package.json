@@ -1,0 +1,21 @@
+{
+  "name": "@layover/core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "bun --env-file=../../.env --watch src/main.ts",
+    "start": "bun --env-file=../../.env src/main.ts",
+    "test": "bun test",
+    "typecheck": "tsc -p tsconfig.json",
+    "demo:act1": "bun --env-file=../../.env src/demo/runner.ts act1",
+    "demo:act2": "bun --env-file=../../.env src/demo/runner.ts act2"
+  },
+  "dependencies": {
+    "@layover/shared": "workspace:*",
+    "hono": "^4.13.17",
+    "openai": "^7.53.0",
+    "viem": "^2.57.17",
+    "zod": "^4.6.7"
+  }
+}
