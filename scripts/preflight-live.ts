@@ -112,18 +112,22 @@ if (loggedIn) {
     fix: mainnet ? `${kpassBin} sandbox off` : `${kpassBin} sandbox on`,
   });
   const al = await kpass(["allowance", "status"]);
+  const allowanceSet = get(al, "set") === true;
   add({
     name: "Account allowance (real data)",
-    ok: env.REAL_DATA === "1" ? (get(al, "status") === "success" ? true : false) : "warn",
-    detail: String(get(al, "user_message") ?? get(al, "hint") ?? get(al, "error") ?? "unknown"),
-    fix: "Set a small allowance (e.g. $2/day) for Layover in the Kite Passport dashboard",
+    ok: allowanceSet ? true : env.REAL_DATA === "1" ? false : "warn",
+    detail: allowanceSet ? String(get(al, "user_message") ?? "set") : "not set",
+    fix: `Set a small allowance (e.g. $2/day) at ${String(get(al, "dashboard_url") ?? "https://agentpassport.ai/overview")}`,
   });
   const wb = await kpass(["wallet", "balance"]);
+  const usd = ((get(wb, "balances") as { asset: string; total: string }[] | undefined) ?? [])
+    .filter((b) => /^USD/.test(b.asset))
+    .reduce((acc, b) => acc + Number(b.total), 0);
   add({
     name: "Passport wallet",
-    ok: "warn",
-    detail: JSON.stringify(get(wb, "balances") ?? get(wb, "assets") ?? wb).slice(0, 160),
-    fix: "Fund ~$5 USDC (Base) into your Passport wallet",
+    ok: usd >= 3 ? true : mainnet ? false : "warn",
+    detail: `$${usd.toFixed(2)} in stablecoins`,
+    fix: "Add about $5 USDC to your Passport wallet (dashboard top-up, or USDC on Base or Kite to your Passport address)",
   });
   add({
     name: "Agent registered",

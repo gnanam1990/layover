@@ -6,7 +6,7 @@ import type { TripRepo } from "../trips/repo";
 import type { MerchantClient } from "../merchant/client";
 import type { ServClient } from "../serv/client";
 import { assess, needsVoucherWarning, overnightNeeded } from "../rights/engine";
-import { explainRights, parseNotice } from "./notice";
+import { deterministicExplanation, explainRights, parseNotice } from "./notice";
 import { deskPhrases } from "../serv/prompts/deskPhrases";
 import { AIRPORTS, DESK_LANGUAGE } from "@layover/shared";
 
@@ -123,12 +123,19 @@ export class DisruptionDetector {
       detail: night.needed ? "You'll need somewhere to sleep tonight." : "No overnight stay needed.",
       data: { flightId: flight.id, facts, overnightNeeded: night.needed, nightDate: night.nightDate },
     });
-    const explanation = await explainRights(this.d.serv, assessment);
-    // Desk phrases in the airport's language (skipped where English is fine, or if SERV is unavailable).
+    // Explanation and desk phrases run in parallel; the phrases translate the engine's own (checked) points.
     const lang = DESK_LANGUAGE[AIRPORTS[flight.from]?.country ?? ""] ?? null;
-    const desk = lang
-      ? await deskPhrases(this.d.serv, explanation.bullets.slice(0, 4), lang, assessment).catch(() => null)
-      : null;
+    const [explanation, desk] = await Promise.all([
+      explainRights(this.d.serv, assessment),
+      lang
+        ? deskPhrases(
+            this.d.serv,
+            deterministicExplanation(assessment).bullets.slice(0, 4),
+            lang,
+            assessment,
+          ).catch(() => null)
+        : Promise.resolve(null),
+    ]);
     const packs = assessment.packs.map((p) => PACK_LABEL[p.pack]);
     timeline.append({
       tripId,

@@ -178,7 +178,10 @@ describe("desk phrases in the local language", () => {
         const n = (opts.user.match(/^\d\./gm) ?? []).length;
         return {
           language: "German",
-          phrases: Array.from({ length: n }, (_, i) => ({ local: `Bitte ${i}`, english: `Please ${i}` })),
+          phrases: Array.from({ length: n }, (_, i) => ({
+            local: `Bitte ${"abcd"[i]}`,
+            english: `Please ${"abcd"[i]}`,
+          })),
         };
       },
     });
@@ -202,5 +205,17 @@ describe("desk phrases in the local language", () => {
     await detector.tick(w.trip.id);
     const ra = w.timeline.list(w.trip.id).find((e) => e.type === "rights_assessed")!;
     expect((ra.data as { desk?: unknown }).desk).toBeUndefined();
+  });
+});
+
+describe("notice timestamp normalization (seen live from SERV)", () => {
+  test("'unknown' → null; '2026-12-21 08:40Z' → ISO; offsets handled", async () => {
+    const { normalizeTimestamp, normalizeFacts } = await import("../src/disruption/notice");
+    expect(normalizeTimestamp("unknown")).toBeNull();
+    expect(normalizeTimestamp(null)).toBeNull();
+    expect(normalizeTimestamp("2026-12-21 08:40Z")).toBe("2026-12-21T08:40:00.000Z");
+    expect(normalizeTimestamp("2026-12-21T10:40+02:00")).toBe("2026-12-21T08:40:00.000Z");
+    const f = normalizeFacts({ ...FACTS, noticeAtUtc: "unknown", newDepUtc: "2026-12-21 08:40Z" });
+    expect(f).toMatchObject({ noticeAtUtc: null, newDepUtc: "2026-12-21T08:40:00.000Z" });
   });
 });
