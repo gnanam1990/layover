@@ -295,6 +295,71 @@ export function createApp(o: CreateAppOpts = {}) {
     return c.json({ trip: s.trips.get(trip.id) });
   });
 
+  /**
+   * Live demo: pay the trip's original hotel booking through Kite as well, so the merchant's later refund
+   * comes out of money it actually received (no pre-funded merchant wallet needed). DECISIONS D13.
+   */
+  app.post("/demo/book-original", async (c) => {
+    const nf = demoOnly(c);
+    if (nf) return nf;
+    const { tripId } = z.object({ tripId: z.string() }).parse(await c.req.json());
+    const trip = s.trips.get(tripId);
+    const b = trip?.hotelBookings.find((x) => x.status === "active" && !x.paymentTx);
+    if (!trip || !b) return c.json({ error: "no unpaid booking" }, 404);
+    const offer = await s.merchant.quote({
+      hotelId: b.hotelId,
+      roomClass: b.roomClass ?? "standard",
+      checkIn: b.checkIn,
+      checkOut: b.checkOut,
+    });
+    const refundTo = (await s.passport.walletAddress()) ?? s.cfg.merchantWallet;
+    const r = await s.sessions.pay(tripId, {
+      url: offer.payUrl,
+      body: {
+        hotelId: b.hotelId,
+        roomClass: offer.roomClass,
+        checkIn: b.checkIn,
+        checkOut: b.checkOut,
+        refundTo,
+      },
+      idempotencyKey: `${tripId}:original:${b.id}`,
+      displayAmountMinor: BigInt(offer.price.amountMinor),
+      bookingId: b.id,
+    });
+    const body = r.body as { confirmation?: string };
+    if (r.status >= 400 || !r.payment || !body.confirmation) {
+      return c.json({ error: "booking_failed", status: r.status }, 502);
+    }
+    s.trips.update(tripId, (t) => ({
+      ...t,
+      hotelBookings: t.hotelBookings.map((x) =>
+        x.id === b.id
+          ? {
+              ...x,
+              confirmation: body.confirmation!,
+              paymentTx: r.payment!.tx ?? null,
+              payer: refundTo,
+              price: offer.price,
+            }
+          : x,
+      ),
+    }));
+    const tx = r.payment.tx;
+    s.timeline.append({
+      tripId,
+      type: "payment",
+      title: `Paid ${offer.hotelName} via Kite Passport`,
+      detail: `Original booking ${body.confirmation} for ${b.checkIn} → ${b.checkOut}.`,
+      ...(tx && { links: [{ label: "Payment on KiteScan", url: s.chain.explorerTx(tx) }] }),
+    });
+    s.timeline.append({
+      tripId,
+      type: "booking_confirmed",
+      title: `Booked ${offer.hotelName} · ${body.confirmation}`,
+    });
+    return c.json({ confirmation: body.confirmation, tx });
+  });
+
   app.post("/demo/price", async (c) => {
     const nf = demoOnly(c);
     if (nf) return nf;

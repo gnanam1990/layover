@@ -16,7 +16,8 @@
     "demo:act1": "pnpm --filter @layover/core demo:act1",
     "demo:act2": "pnpm --filter @layover/core demo:act2",
     "dev:offline": "bun scripts/dev-offline.ts",
-    "e2e": "pnpm --filter @layover/web e2e"
+    "e2e": "pnpm --filter @layover/web e2e",
+    "preflight": "bun scripts/preflight-live.ts"
   },
   "devDependencies": {
     "@types/bun": "^1.4.4",
@@ -24,6 +25,7 @@
     "eslint": "^9.39.5",
     "prettier": "^3.9.10",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.72.1"
+    "typescript-eslint": "^8.72.1",
+    "viem": "^2.57.17"
   }
 }

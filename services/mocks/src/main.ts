@@ -4,6 +4,7 @@ import { createMerchantApp } from "./merchant";
 import { MockState } from "./state";
 import { NETWORKS, type KiteNetwork } from "./config";
 import { createViemRefundSender, unconfiguredRefundSender } from "./refund-sender";
+import { createFacilitatorRefundSender } from "./facilitator-refund";
 import { SimulatedFacilitator } from "./sim-facilitator";
 
 const env = process.env;
@@ -26,8 +27,12 @@ const simulatedRefundSender = {
     return `0x${h}`;
   },
 };
+// REFUND_VIA=facilitator (default with a key): the facilitator settles a merchant-signed transfer and pays
+// the gas, so the merchant needs no KITE. REFUND_VIA=gas: the merchant sends the transfer itself.
 const refundSender = env.MERCHANT_REFUND_KEY
-  ? createViemRefundSender(NETWORKS[network], env.MERCHANT_REFUND_KEY as Hex)
+  ? env.REFUND_VIA === "gas"
+    ? createViemRefundSender(NETWORKS[network], env.MERCHANT_REFUND_KEY as Hex)
+    : createFacilitatorRefundSender(NETWORKS[network], env.MERCHANT_REFUND_KEY as Hex, facilitator)
   : env.FACILITATOR_URL === "sim"
     ? simulatedRefundSender
     : unconfiguredRefundSender;

@@ -156,3 +156,36 @@ describe("intake regressions", () => {
     expect(j.trip).not.toBeNull();
   });
 });
+
+describe("live demo: original booking paid through Kite", () => {
+  test("book-original pays the original hotel, then Act 1 refunds that paid booking", async () => {
+    const { post, get, facilitator } = setup();
+    const { trip } = (await (await post("/demo/seed")).json()) as { trip: { id: string } };
+    await post(`/trips/${trip.id}/protect`, {});
+    await post("/demo/approve", { tripId: trip.id });
+    for (
+      let i = 0;
+      i < 50 && (await get<{ trip: { status: string } }>(`/trips/${trip.id}`)).trip.status !== "protected";
+      i++
+    ) {
+      await new Promise((r) => setTimeout(r, 10));
+    }
+    const r = (await (await post("/demo/book-original", { tripId: trip.id })).json()) as {
+      confirmation: string;
+      tx: string;
+    };
+    expect(r.confirmation).toMatch(/^LX-/);
+    expect(r.tx).toMatch(/^0xsim/);
+    const t = await get<{ trip: { hotelBookings: { confirmation: string; paymentTx: string }[] } }>(
+      `/trips/${trip.id}`,
+    );
+    expect(t.trip.hotelBookings[0]).toMatchObject({ confirmation: r.confirmation, paymentTx: r.tx });
+    await post("/demo/price", { hotelId: "lumen-goa", roomClass: "standard", newPrice: 58 });
+    await post("/demo/tick");
+    const tl = await get<{ type: string; title: string }[]>(`/trips/${trip.id}/timeline`);
+    expect(tl.find((e) => e.type === "cancel_requested")!.title).toContain(r.confirmation);
+    expect(tl.map((e) => e.type)).toContain("refund_verified");
+    expect(facilitator.settleCalls).toBe(2); // original $72 + rebook $58
+    expect((await post("/demo/book-original", { tripId: trip.id })).status).toBe(404); // nothing unpaid left
+  });
+});

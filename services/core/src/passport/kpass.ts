@@ -42,7 +42,9 @@ export type KpassRunner = (
 ) => Promise<{ exitCode: number; stdout: string; stderr: string }>;
 
 export function defaultKpassBin(): string {
-  if (process.env.KPASS_BIN) return process.env.KPASS_BIN;
+  // A bare "kpass" only works when ~/.kpass/bin is on PATH (not guaranteed on Windows): prefer the install.
+  const configured = process.env.KPASS_BIN;
+  if (configured && configured !== "kpass") return configured;
   for (const f of ["kpass.exe", "kpass"]) {
     const p = join(homedir(), ".kpass", "bin", f);
     if (existsSync(p)) return p;
