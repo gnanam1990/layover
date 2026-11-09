@@ -73,7 +73,8 @@ describe("kpass argv", () => {
       approvalUrl: "https://agentpassport.ai/agent-session/approve?token=abc",
       userMessage: "Approve here",
     });
-    const argv = calls[0]!;
+    expect(calls[0]!.slice(0, 3)).toEqual(["agent:register", "--type", "layover"]); // registers first
+    const argv = calls[1]!;
     expect(argv.slice(0, 2)).toEqual(["session", "create"]);
     expect(argv).toContain("--separate");
     expect(argv).toContain("--no-browser");
@@ -188,6 +189,13 @@ describe("error mapping", () => {
       expect(e.hint.toLowerCase()).toContain(hintWord);
     });
   }
+  test("logged-out and unregistered errors (no error_code) get clear codes", () => {
+    expect(mapKpassError({ error: "Not logged in. Run 'kpass login init'" }, 3).code).toBe("not_logged_in");
+    expect(mapKpassError({ error: "Agent not registered. Run 'kpass agent:register'" }, 3).code).toBe(
+      "agent_not_registered",
+    );
+    expect(mapKpassError({ error: "x" }, 3).hint).toContain("kpass login");
+  });
   test("unknown codes become 'unknown' with the exit code kept", () => {
     const e = mapKpassError({ error: "weird" }, 1);
     expect(e.code).toBe("unknown");

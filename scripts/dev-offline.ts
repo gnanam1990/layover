@@ -10,6 +10,10 @@ import { join } from "node:path";
 import { tmpdir } from "node:os";
 
 const root = join(import.meta.dir, "..");
+// Spawn by absolute path: on Windows `bun`/`pnpm` are .cmd shims that a direct spawn can't resolve.
+const BUN = process.execPath;
+const NODE = Bun.which("node") ?? "node";
+const NEXT = join(root, "apps/web/node_modules/next/dist/bin/next");
 const prod = process.argv.includes("--prod");
 const run = Date.now();
 const MERCHANT_PORT = Number(process.env.OFFLINE_MERCHANT_PORT ?? 8601);
@@ -18,8 +22,16 @@ const WEB_PORT = Number(process.env.OFFLINE_WEB_PORT ?? 3000);
 const TOKEN = "offline-token";
 const ADMIN = "offline-admin";
 
+// Bun auto-loads the repo's .env into process.env. Offline mode must never see real keys or settings
+// (e.g. MERCHANT_REFUND_KEY, SERV_API_KEY), so every app variable from .env.example is dropped first.
+const APP_KEYS = (await Bun.file(join(root, ".env.example")).text())
+  .split("\n")
+  .map((l) => /^([A-Z0-9_]+)=/.exec(l.trim())?.[1])
+  .filter((k): k is string => !!k);
+const inherited = Object.fromEntries(Object.entries(process.env).filter(([k]) => !APP_KEYS.includes(k)));
+
 const shared = {
-  ...process.env,
+  ...inherited,
   DEMO_MODE: "1",
   LAYOVER_LOCAL_TOKEN: TOKEN,
   ADMIN_TOKEN: ADMIN,
@@ -28,7 +40,7 @@ const shared = {
 };
 
 const procs = [
-  Bun.spawn(["bun", "src/main.ts"], {
+  Bun.spawn([BUN, "src/main.ts"], {
     cwd: join(root, "services/mocks"),
     env: {
       ...shared,
@@ -42,7 +54,7 @@ const procs = [
     stdout: "inherit",
     stderr: "inherit",
   }),
-  Bun.spawn(["bun", "src/main.ts"], {
+  Bun.spawn([BUN, "src/main.ts"], {
     cwd: join(root, "services/core"),
     env: {
       ...shared,
@@ -58,17 +70,12 @@ const procs = [
     stdout: "inherit",
     stderr: "inherit",
   }),
-  Bun.spawn(
-    prod
-      ? ["pnpm", "exec", "next", "start", "-p", String(WEB_PORT)]
-      : ["pnpm", "exec", "next", "dev", "-p", String(WEB_PORT)],
-    {
-      cwd: join(root, "apps/web"),
-      env: { ...shared, CORE_URL: `http://localhost:${CORE_PORT}`, PORT: String(WEB_PORT) },
-      stdout: "inherit",
-      stderr: "inherit",
-    },
-  ),
+  Bun.spawn([NODE, NEXT, prod ? "start" : "dev", "-p", String(WEB_PORT)], {
+    cwd: join(root, "apps/web"),
+    env: { ...shared, CORE_URL: `http://localhost:${CORE_PORT}`, PORT: String(WEB_PORT) },
+    stdout: "inherit",
+    stderr: "inherit",
+  }),
 ];
 
 const stop = () => {

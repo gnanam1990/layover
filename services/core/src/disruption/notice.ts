@@ -28,7 +28,11 @@ const KIND_LABEL: Record<string, string> = {
 /** Plain explanation built only from the assessment; used when SERV's explanation fails its checks. */
 export function deterministicExplanation(a: RightsAssessment): Explanation {
   const best = a.packs.find((p) => a.bestRemedy.startsWith(p.pack)) ?? a.packs[0];
-  const bullets = (best?.entitlements ?? []).slice(0, 5).map((e) => {
+  const ORDER = ["care_hotel", "care_meal", "care_transport", "compensation", "refund", "reroute"];
+  const urgentFirst = [...(best?.entitlements ?? [])].sort(
+    (a, b) => ORDER.indexOf(a.kind) - ORDER.indexOf(b.kind),
+  );
+  const bullets = urgentFirst.slice(0, 5).map((e) => {
     const amt = e.amount
       ? ` of ${formatMoney(e.amount)}`
       : e.amountUpTo

@@ -29,7 +29,7 @@ export function TopBar({ protectedTrip = false }: { protectedTrip?: boolean }) {
     <header className="sticky top-0 z-20 px-4 pt-4">
       <nav
         aria-label="Main"
-        className="mx-auto flex max-w-[1200px] flex-wrap items-center gap-3 rounded-pill border border-line-warm bg-white px-4 py-2 shadow-card"
+        className="mx-auto flex max-w-[1200px] flex-wrap items-center gap-3 rounded-panel border sm:rounded-pill border-line-warm bg-white px-4 py-2 shadow-card"
       >
         <Link href="/" className="mr-2">
           <Logo />

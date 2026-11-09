@@ -127,6 +127,13 @@ function Protect({
     return d.toISOString();
   }, [detail.trip]);
 
+  const invalid = !(perBooking >= 1)
+    ? "Max per booking must be at least $1."
+    : !(budget >= 0)
+      ? "Emergency budget can't be negative."
+      : !(minSaving >= 0)
+        ? "Minimum saving can't be negative."
+        : null;
   const session = detail.session;
   const rejected = session?.status === "rejected";
   const capError = last(events, "error");
@@ -145,6 +152,8 @@ function Protect({
       await api.protect(detail.trip.id, settings);
       onRefresh();
     } catch (e) {
+      // The sign-in banner already says this; don't repeat it as an error.
+      if (e instanceof ApiError && e.body.error === "not_logged_in" && needsLogin) return;
       setError(e instanceof ApiError ? (e.body.userMessage ?? e.message) : "Couldn't reach Kite Passport.");
     } finally {
       setBusy(false);
@@ -171,6 +180,7 @@ function Protect({
               <label className="flex items-center gap-3">
                 <input
                   type="checkbox"
+                  aria-label="Auto-rebook when the price drops"
                   checked={autoRebook}
                   onChange={(e) => setAutoRebook(e.target.checked)}
                   className="h-4 w-4 accent-[var(--olive-700)]"
@@ -190,6 +200,7 @@ function Protect({
               <label className="flex items-center gap-3">
                 <input
                   type="checkbox"
+                  aria-label="Auto-rescue: book a hotel if my flight breaks"
                   checked={autoRescue}
                   onChange={(e) => setAutoRescue(e.target.checked)}
                   className="h-4 w-4 accent-[var(--olive-700)]"
@@ -200,6 +211,7 @@ function Protect({
                 <span className="t-small text-muted">Emergency budget ($)</span>
                 <input
                   type="number"
+                  aria-label="Emergency budget in dollars"
                   min={0}
                   value={budget}
                   onChange={(e) => setBudget(Number(e.target.value))}
@@ -210,6 +222,7 @@ function Protect({
                 <span className="t-small text-muted">Max per booking ($)</span>
                 <input
                   type="number"
+                  aria-label="Max per booking in dollars"
                   min={1}
                   value={perBooking}
                   onChange={(e) => setPerBooking(Number(e.target.value))}
@@ -241,7 +254,12 @@ function Protect({
                 This needs more than your trip budget allows. Approve a bigger budget?
               </p>
             )}
-            <button className="btn btn-primary mt-5" disabled={busy} onClick={protect}>
+            {invalid && (
+              <p role="alert" className="mt-4 text-danger">
+                {invalid}
+              </p>
+            )}
+            <button className="btn btn-primary mt-5" disabled={busy || !!invalid} onClick={protect}>
               Protect my trip
             </button>
           </Card>
@@ -306,7 +324,9 @@ function Dashboard({
               title={
                 (decisionEv.data as unknown as PolicyDecision).allow && dropOffer
                   ? `${dropOffer.hotelName.replace("Hotel ", "Hotel ")} dropped to ${formatMoney(dropOffer.price)}. Same room, same dates.`
-                  : decisionEv.title
+                  : (decisionEv.data as unknown as PolicyDecision).reasons.join() === "consent" && dropOffer
+                    ? `${dropOffer.hotelName} dropped to ${formatMoney(dropOffer.price)}. Waiting for your tap to rebook.`
+                    : decisionEv.title
               }
             />
           )}

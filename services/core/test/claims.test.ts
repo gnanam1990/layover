@@ -3,7 +3,7 @@ import type { NoticeFacts } from "@layover/shared";
 import { DisruptionDetector } from "../src/disruption/detector";
 import { RescueOrchestrator } from "../src/rescue/orchestrator";
 import { ClaimBuilder, checkLetter, mailtoLink, templateLetter, type ClaimData } from "../src/claims/pack";
-import { ServValidationError } from "../src/serv/client";
+import { ServUpstreamError, ServValidationError } from "../src/serv/client";
 import { makeWorld, ORIGIN } from "./world";
 import { fakeServ, type Handler } from "./fake-serv";
 
@@ -169,5 +169,15 @@ describe("mailto", () => {
   });
   test("over 2,000 characters → null (copy-only)", () => {
     expect(mailtoLink({ subject: "x", body: "y".repeat(2100) })).toBeNull();
+  });
+});
+
+describe("fallback reason", () => {
+  test("when SERV is unavailable the claim says so (not 'didn't pass the checks')", async () => {
+    const { w } = await act2(() => {
+      throw new ServUpstreamError("down");
+    });
+    const ev = w.timeline.list(w.trip.id).find((e) => e.type === "claim_ready")!;
+    expect(ev.detail).toContain("SERV Reasoning wasn't available");
   });
 });

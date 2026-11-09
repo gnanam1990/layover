@@ -145,3 +145,14 @@ describe("core API", () => {
     expect(r.status).toBe(404);
   });
 });
+
+describe("intake regressions", () => {
+  test("a hotel-only trip needs no flight", async () => {
+    const { post } = setup();
+    const j = (await (
+      await post("/trips/intake", { text: "I'm Priya. Hotel Lumen Goa HX-2231 Dec 22–24" })
+    ).json()) as { trip: unknown; missing: string[] };
+    expect(j.missing).toEqual([]);
+    expect(j.trip).not.toBeNull();
+  });
+});

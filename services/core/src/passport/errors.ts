@@ -28,6 +28,10 @@ const HINTS: Record<string, string> = {
   payment_outcome_pending: "The payment may have gone through; it is being checked. Do not pay again.",
   allowance_unavailable: "No approved session and no account allowance. Approve a trip session first.",
   provider_unavailable: "Kite Passport is temporarily unavailable. Try again shortly.",
+  not_logged_in:
+    "Sign in to Kite Passport first: kpass login init --email you@example.com (or signup init), then kpass sandbox on.",
+  agent_not_registered:
+    "Layover isn't registered as an agent in Kite Passport yet; it registers itself on the next try.",
   unknown: "Kite Passport returned an unexpected error.",
 };
 
@@ -51,7 +55,14 @@ export class PassportError extends Error {
 }
 
 export function mapKpassError(j: Record<string, unknown>, exitCode: number): PassportError {
-  const raw = typeof j.error_code === "string" && j.error_code ? j.error_code : "unknown";
+  // Some kpass errors (auth, registration) carry no error_code: classify them from the message.
+  const msg = typeof j.error === "string" ? j.error : "";
+  const inferred = /agent not registered/i.test(msg)
+    ? "agent_not_registered"
+    : exitCode === 3 || /not logged in|log ?in|sign ?up|no user session/i.test(msg)
+      ? "not_logged_in"
+      : "unknown";
+  const raw = typeof j.error_code === "string" && j.error_code ? j.error_code : inferred;
   const code = raw in HINTS ? raw : raw === "unknown" ? "unknown" : raw;
   const hint = HINTS[code] ?? HINTS.unknown!;
   const userMessage = typeof j.user_message === "string" ? String(redact(j.user_message)) : undefined;

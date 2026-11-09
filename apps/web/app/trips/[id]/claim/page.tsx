@@ -21,7 +21,7 @@ export default function ClaimPage({ params }: { params: Promise<{ id: string }> 
   const [claim, setClaim] = useState<{ pack: ClaimPack; mailto: string | null } | null | undefined>(
     undefined,
   );
-  const [copied, setCopied] = useState(false);
+  const [copied, setCopied] = useState<boolean | null>(false);
   useEffect(() => {
     api
       .claim(id)
@@ -56,8 +56,23 @@ export default function ClaimPage({ params }: { params: Promise<{ id: string }> 
   const { pack, mailto } = claim;
   const letter = `Subject: ${pack.letter.subject}\n\n${pack.letter.body}`;
   const copy = async () => {
-    await navigator.clipboard.writeText(letter);
-    setCopied(true);
+    try {
+      await navigator.clipboard.writeText(letter);
+      setCopied(true);
+      return;
+    } catch {
+      // Clipboard API blocked (permissions/insecure context): fall back to a hidden textarea.
+    }
+    const ta = document.createElement("textarea");
+    ta.value = letter;
+    ta.setAttribute("readonly", "");
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select();
+    const ok = document.execCommand("copy");
+    ta.remove();
+    setCopied(ok ? true : null);
   };
   return (
     <>
@@ -121,7 +136,7 @@ export default function ClaimPage({ params }: { params: Promise<{ id: string }> 
           </pre>
           <div className="mt-4 flex flex-wrap gap-3">
             <button className="btn btn-secondary" onClick={copy}>
-              {copied ? "Copied" : "Copy letter"}
+              {copied ? "Copied" : copied === null ? "Copy blocked: select the letter text" : "Copy letter"}
             </button>
             {mailto ? (
               <a className="btn btn-primary" href={mailto}>

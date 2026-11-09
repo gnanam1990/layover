@@ -94,7 +94,9 @@ export class KpassPassport implements PassportAdapter {
   /** Last command output, redacted, for diagnostics. Never log raw kpass output. */
   lastOutput: unknown;
 
-  constructor(o: { runner?: KpassRunner; bin?: string; verbs?: KpassVerbs } = {}) {
+  private agentType: string;
+  constructor(o: { runner?: KpassRunner; bin?: string; verbs?: KpassVerbs; agentType?: string } = {}) {
+    this.agentType = o.agentType ?? process.env.KPASS_AGENT_TYPE ?? "layover";
     this.run = o.runner ?? bunRunner(o.bin ?? defaultKpassBin());
     this.verbs = o.verbs ?? KPASS_ARGV;
   }
@@ -130,7 +132,16 @@ export class KpassPassport implements PassportAdapter {
     return JSON.stringify(j).match(/0x[0-9a-fA-F]{40}/)?.[0];
   }
 
+  /** kpass ≥ 6 needs the agent registered before it can ask for a session (idempotent; DECISIONS D11). */
+  private registered = false;
+  async ensureAgentRegistered(): Promise<void> {
+    if (this.registered) return;
+    await this.call("agentRegister", ["--type", this.agentType]);
+    this.registered = true;
+  }
+
   async requestSession(p: SessionRequest): Promise<SessionRequested> {
+    await this.ensureAgentRegistered();
     const delegation = {
       task: { summary: p.taskSummary },
       payment_policy: {
